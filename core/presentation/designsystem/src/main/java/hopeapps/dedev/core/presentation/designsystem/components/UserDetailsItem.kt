@@ -38,9 +38,12 @@ import hopeapps.dedev.core.presentation.designsystem.R
 
 @Composable
 fun UserDetailsItem(
-    title: String,
-    description: String,
-    imageUrl: String,
+    name: String,
+    bio: String,
+    follows: String,
+    following: String,
+    repositories: String,
+    avatarUrl: String,
     @DrawableRes placeholderDrawableRes: Int = R.drawable.ic_test,
     contentDescription: String? = null,
     errorDrawableRes: Int = R.drawable.ic_test,
@@ -68,7 +71,7 @@ fun UserDetailsItem(
                     .clip(CircleShape)
                     .testTag("contact_image"),
                 model = ImageRequest.Builder(LocalContext.current)
-                    .data(imageUrl)
+                    .data(avatarUrl)
                     .crossfade(true)
                     .error(errorDrawableRes)
                     .fallback(errorDrawableRes)
@@ -96,13 +99,29 @@ fun UserDetailsItem(
         Column {
             DefaultText(
                 modifier = Modifier.padding(top = 8.dp),
-                text = title
+                text = "Nome: $name"
             )
 
             DefaultText(
                 modifier = Modifier.padding(top = 8.dp),
-                text = description
+                text = "Bio: $bio"
             )
+
+            DefaultText(
+                modifier = Modifier.padding(top = 8.dp),
+                text = "Follows: $follows"
+            )
+
+            DefaultText(
+                modifier = Modifier.padding(top = 8.dp),
+                text = "Following: $following"
+            )
+
+            DefaultText(
+                modifier = Modifier.padding(top = 8.dp),
+                text = "Repositories: $repositories"
+            )
+
         }
     }
 }
@@ -113,12 +132,16 @@ fun UserDetailsItem(
 fun UserDetailsItemPreview() {
     MaterialTheme {
         UserDetailsItem(
-            title = "Título",
-            description = "Description",
-            imageUrl = "",
             placeholderDrawableRes = R.drawable.ic_test,
             errorDrawableRes = 0,
-            onClickItem = {}
+            onClickItem = {},
+            name = "",
+            bio = "",
+            follows = "",
+            following = "",
+            repositories = "",
+            avatarUrl = "",
+            contentDescription = ""
         )
     }
 }

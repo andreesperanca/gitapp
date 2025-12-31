@@ -4,6 +4,7 @@ import android.app.Application
 import hopeapps.dedev.core.database.di.databaseModule
 import hopeapps.dedev.core.network.di.apiModule
 import hopeapps.dedev.core.network.di.networkModule
+import hopeapps.dedev.gitapp.di.featureRepo
 import hopeapps.dedev.gitapp.di.featureUsers
 import org.koin.android.ext.koin.androidContext
 import org.koin.android.ext.koin.androidLogger
@@ -22,7 +23,8 @@ class GitApp() : Application() {
                 networkModule,
                 apiModule,
                 // Esse módulo deve ir para a feature depois
-                featureUsers
+                featureUsers,
+                featureRepo
             )
         }
     }

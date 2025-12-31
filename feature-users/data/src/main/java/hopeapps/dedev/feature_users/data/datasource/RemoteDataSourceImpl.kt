@@ -1,14 +1,14 @@
 package hopeapps.dedev.feature_users.data.datasource
 
-import hopeapps.dedev.core.network.UserApi
+import hopeapps.dedev.core.network.GitApi
+import hopeapps.dedev.core.network.models.RepositoryDto
 import hopeapps.dedev.core.network.models.UserDto
 
 class RemoteDataSourceImpl(
-    val userApi: UserApi
+    val gitApi: GitApi
 ): RemoteDataSource {
 
     override suspend fun searchUser(userFilterText: String): UserDto {
-        return userApi.fetchRemoteUser(userFilterText)
+        return gitApi.fetchRemoteUser(userFilterText)
     }
-
 }

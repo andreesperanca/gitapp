@@ -1,5 +1,6 @@
 <?xml version="1.0" encoding="UTF-8"?>
 <project version="4">
+  <component name="GradleMigrationSettings" migrationVersion="1" />
   <component name="GradleSettings">
     <option name="linkedExternalProjectsSettings">
       <GradleProjectSettings>
@@ -15,6 +16,10 @@
             <option value="$PROJECT_DIR$/core/network" />
             <option value="$PROJECT_DIR$/core/presentation" />
             <option value="$PROJECT_DIR$/core/presentation/designsystem" />
+            <option value="$PROJECT_DIR$/feature-repo" />
+            <option value="$PROJECT_DIR$/feature-repo/data" />
+            <option value="$PROJECT_DIR$/feature-repo/domain" />
+            <option value="$PROJECT_DIR$/feature-repo/presentation" />
             <option value="$PROJECT_DIR$/feature-users" />
             <option value="$PROJECT_DIR$/feature-users/data" />
             <option value="$PROJECT_DIR$/feature-users/domain" />

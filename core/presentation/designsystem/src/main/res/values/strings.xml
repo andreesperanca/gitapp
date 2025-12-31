@@ -1,0 +1,6 @@
+<?xml version="1.0" encoding="utf-8"?>
+<resources>
+    <string name="search_repositories">Linguagem</string>
+    <string name="repositories">Repositórios</string>
+    <string name="search_title">Buscar</string>
+</resources>

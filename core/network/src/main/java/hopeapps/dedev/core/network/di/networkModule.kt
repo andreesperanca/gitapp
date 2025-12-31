@@ -1,8 +1,8 @@
 package hopeapps.dedev.core.network.di
 
 import com.google.gson.GsonBuilder
+import hopeapps.dedev.core.network.AuthInterceptor
 import okhttp3.OkHttpClient
-import org.koin.core.qualifier.named
 import org.koin.dsl.module
 import retrofit2.Retrofit
 import retrofit2.converter.gson.GsonConverterFactory
@@ -15,10 +15,13 @@ val networkModule = module {
     }
 
     single {
-        OkHttpClient.Builder().build()
+        OkHttpClient
+            .Builder()
+            .addInterceptor(AuthInterceptor("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"))
+            .build()
     }
 
-    single(named("USER")) {
+    single {
         Retrofit.Builder()
             .baseUrl("https://api.github.com/")
             .client(get())

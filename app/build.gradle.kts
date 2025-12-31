@@ -49,6 +49,8 @@ dependencies {
     implementation(libs.androidx.compose.ui.graphics)
     implementation(libs.androidx.compose.ui.tooling.preview)
     implementation(libs.androidx.compose.material3)
+
+    //Tests
     testImplementation(libs.junit)
     androidTestImplementation(libs.androidx.junit)
     androidTestImplementation(libs.androidx.espresso.core)
@@ -69,5 +71,14 @@ dependencies {
     implementation(project(":core:database"))
     implementation(project(":core:network"))
     implementation(project(":core:presentation:designsystem"))
-
+    //Feature Repo
+    implementation(project(":feature-repo:presentation"))
+    implementation(project(":feature-repo:data"))
+    implementation(project(":feature-repo:domain"))
+    //Paging
+    implementation("androidx.paging:paging-runtime-ktx:3.1.1")
+    implementation("androidx.paging:paging-compose:1.0.0-alpha18")
+    implementation("androidx.room:room-ktx:2.6.1")
+    //Navigation
+    implementation("androidx.navigation:navigation-compose:2.9.6")
 }

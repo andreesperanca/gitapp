@@ -1,5 +1,6 @@
 package hopeapps.dedev.feature_users.data.datasource
 
+import hopeapps.dedev.core.network.models.RepositoryDto
 import hopeapps.dedev.core.network.models.UserDto
 
 interface RemoteDataSource {

@@ -21,6 +21,8 @@ koinCore = "4.1.1"
 coilCompose = "3.3.0"
 coilNetworkOkhttp = "3.3.0"
 coilTest = "3.3.0"
+uiText = "1.10.0"
+protoliteWellKnownTypes = "18.0.1"
 
 
 [libraries]
@@ -62,6 +64,8 @@ koin-android = { module = "io.insert-koin:koin-android", version.ref = "koinCore
 koin-androidx-compose = { module = "io.insert-koin:koin-androidx-compose", version.ref = "koinAndroidxCompose" }
 koin-bom = { module = "io.insert-koin:koin-bom", version.ref = "koinBom" }
 koin-core = { module = "io.insert-koin:koin-core", version.ref = "koinCore" }
+androidx-compose-ui-text = { group = "androidx.compose.ui", name = "ui-text", version.ref = "uiText" }
+protolite-well-known-types = { group = "com.google.firebase", name = "protolite-well-known-types", version.ref = "protoliteWellKnownTypes" }
 
 [plugins]
 android-application = { id = "com.android.application", version.ref = "agp" }
