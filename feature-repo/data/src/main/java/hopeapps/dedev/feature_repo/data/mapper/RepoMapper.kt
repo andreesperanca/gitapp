@@ -29,6 +29,7 @@ fun RepositoryDto.toRepositoryEntity(): RepositoryEntity {
         language = language ?: "",
         lastUpdate = updatedAt,
         isFork = isFork,
+        userLogin = owner.login
     )
 }
 
@@ -37,7 +38,7 @@ fun List<RepositoryDto>.toDomain(): List<Repository> {
     return map { it.toDomain() }
 }
 
-fun RepositoryEntity.toRepository(): Repository {
+fun RepositoryEntity.toDomain(): Repository {
     return Repository(
         id = id,
         name = name,

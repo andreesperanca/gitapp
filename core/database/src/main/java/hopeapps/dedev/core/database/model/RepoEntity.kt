@@ -17,4 +17,5 @@ data class RepositoryEntity(
     val language: String,
     val lastUpdate: String,
     val isFork: Boolean,
+    val userLogin: String
 )

@@ -15,7 +15,7 @@ import kotlinx.coroutines.launch
 
 class UserViewModel(
     private val searchUsersUseCase: SearchUserUseCase,
-    private val fetchRecentUsers: FetchRecentUsersUseCase
+    private val fetchRecentUsersUseCase: FetchRecentUsersUseCase
 ) : ViewModel() {
 
     var state = MutableStateFlow(UserState())
@@ -91,15 +91,30 @@ class UserViewModel(
     }
 
     private fun fetchHistoricUsers() {
-        viewModelScope.launch(Dispatchers.IO) {
-            val response = fetchRecentUsers()
-            if (response is Result.Success) {
+
+        viewModelScope.launchSuspend(
+            block = {
+                fetchRecentUsersUseCase()
+            },
+            onLoading = { isLoading ->
                 state.update { state ->
                     state.copy(
-                        recentUsers = response.data
+                        isLoading = isLoading
                     )
                 }
+            },
+            onResult = { response ->
+                if (response is Result.Error) {
+                    sendEvent(UserEvent.ShowSnackBar(message = "Error message!"))
+                }
+                if (response is Result.Success) {
+                    state.update { state ->
+                        state.copy(
+                            recentUsers = response.data
+                        )
+                    }
+                }
             }
-        }
+        )
     }
 }

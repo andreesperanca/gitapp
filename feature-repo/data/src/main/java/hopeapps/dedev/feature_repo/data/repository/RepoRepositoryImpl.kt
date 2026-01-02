@@ -8,7 +8,7 @@ import androidx.paging.map
 import hopeapps.dedev.core.database.AppDatabase
 import hopeapps.dedev.core.network.GitApi
 import hopeapps.dedev.feature_repo.data.datasource.RepoRemoteMediator
-import hopeapps.dedev.feature_repo.data.mapper.toRepository
+import hopeapps.dedev.feature_repo.data.mapper.toDomain
 import hopeapps.dedev.feature_repo.data.paging.SearchPagingSource
 import hopeapps.dedev.feature_repo.domain.entity.RepoSearchFilter
 import hopeapps.dedev.feature_repo.domain.entity.Repository
@@ -23,7 +23,9 @@ class RepoRepositoryImpl(
 ) : RepoRepository {
 
     override fun fetchRepoPaginated(userFilterText: String): Flow<PagingData<Repository>> {
-        val pagingSourceFactory = { db.repoDao().getAllRepositories() }
+        val pagingSourceFactory = {
+            db.repoDao().getAllRepositories(userFilterText)
+        }
         val pager = Pager(
             config = PagingConfig(pageSize = 10, prefetchDistance = 30),
             remoteMediator = RepoRemoteMediator(
@@ -38,7 +40,7 @@ class RepoRepositoryImpl(
             .flow
             .map { pagingData ->
                 pagingData.map { repositoryEntity ->
-                    repositoryEntity.toRepository()
+                    repositoryEntity.toDomain()
                 }
             }
     }

@@ -1,6 +1,5 @@
 package hopeapps.dedev.feature_repo.data.datasource
 
-import android.util.Log
 import androidx.paging.ExperimentalPagingApi
 import androidx.paging.LoadType
 import androidx.paging.PagingState
@@ -54,7 +53,6 @@ class RepoRemoteMediator(
             )
 
             val endOfPaginationReached = repositories.isEmpty()
-            Log.d("log_debug", "Chamada API currentPage = $currentPage e perPage ${state.config.pageSize} items carregados: ${repositories.size}")
 
             val prevPage = if (currentPage == 1) null else currentPage - 1
             val nextPage = if (endOfPaginationReached) null else currentPage + 1
@@ -62,7 +60,7 @@ class RepoRemoteMediator(
             db.withTransaction {
                 if (loadType == LoadType.REFRESH) {
                     db.remoteKeyDao().clearRemoteKeys()
-                    db.repoDao().clearAll()
+                    db.repoDao().clearAll(useFilterText)
                 }
 
                 val keys = repositories.map { repositoryDto ->
@@ -93,12 +91,4 @@ class RepoRemoteMediator(
         }
     }
 
-    private suspend fun getLastRemoteKey(
-        state: PagingState<Int, RepositoryEntity>
-    ): RepoItemRemoteKeysEntity? {
-        return state.pages.lastOrNull { it.data.isNotEmpty() }?.data?.lastOrNull()
-            ?.let {
-                db.remoteKeyDao().remoteKeysByRepoId(repoId = it.id)
-            }
-    }
 }

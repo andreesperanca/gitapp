@@ -2,8 +2,6 @@ package hopeapps.dedev.feature_repo.presentation.list
 
 
 import androidx.compose.foundation.layout.Arrangement
-import androidx.compose.foundation.layout.Column
-import androidx.compose.foundation.layout.PaddingValues
 import androidx.compose.foundation.layout.fillMaxSize
 import androidx.compose.foundation.layout.padding
 import androidx.compose.foundation.lazy.LazyColumn
@@ -18,6 +16,7 @@ import androidx.compose.runtime.Composable
 import androidx.compose.ui.Modifier
 import androidx.compose.ui.res.stringResource
 import androidx.compose.ui.tooling.preview.Preview
+import androidx.paging.LoadState
 import androidx.paging.PagingData
 import androidx.paging.compose.LazyPagingItems
 import androidx.paging.compose.collectAsLazyPagingItems
@@ -25,7 +24,10 @@ import androidx.paging.compose.itemKey
 import hopeapps.dedev.core.presentation.designsystem.LocalSpacing
 import hopeapps.dedev.core.presentation.designsystem.R
 import hopeapps.dedev.core.presentation.designsystem.components.DefaultTopAppBar
+import hopeapps.dedev.core.presentation.designsystem.components.EmptyState
+import hopeapps.dedev.core.presentation.designsystem.components.ErrorState
 import hopeapps.dedev.core.presentation.designsystem.components.RepositoryItem
+import hopeapps.dedev.core.presentation.designsystem.screen.LoadingLayout
 import hopeapps.dedev.feature_repo.domain.entity.Repository
 import kotlinx.coroutines.flow.flowOf
 import org.koin.androidx.compose.koinViewModel
@@ -65,6 +67,8 @@ fun RepositoriesScreen(
     backButtonListener: () -> Unit
 ) {
 
+    val pagerState = repositories.loadState
+
     Scaffold(
         topBar = {
             DefaultTopAppBar(
@@ -94,36 +98,57 @@ fun RepositoriesScreen(
             )
         }
     ) { paddingValues ->
-        Column(
+
+        LoadingLayout(
             modifier = Modifier
                 .padding(paddingValues)
-                .fillMaxSize()
-        ) {
-            LazyColumn(
-                contentPadding = PaddingValues(LocalSpacing.current.small),
-                verticalArrangement = Arrangement
-                    .spacedBy(LocalSpacing.current.extraSmall)
-            ) {
-                items(
-                    count = repositories.itemCount,
-                    key = repositories.itemKey { repository -> repository.id }
-                ) { index ->
-                    val repository = repositories[index]
-                    if (repository != null) {
-                        RepositoryItem(
-                            name = repository.name,
-                            description = repository.description,
-                            language = repository.language,
-                            onClick = {
-                                onRepositoryClick(repository)
-                            }
+                .fillMaxSize(),
+            isLoading = pagerState.refresh is LoadState.Loading,
+            content = {
+                val loadState = repositories.loadState
+
+                when {
+                    loadState.refresh is LoadState.Error && repositories.itemCount == 0 -> {
+                        ErrorState(
+                            modifier = Modifier.padding(horizontal = LocalSpacing.current.large),
+                            message = "Sem conexão com a internet"
                         )
+                    }
+
+                    loadState.refresh is LoadState.NotLoading && repositories.itemCount == 0 -> {
+                        EmptyState(
+                            modifier = Modifier.padding(horizontal = LocalSpacing.current.large),
+                            message = "Nada aqui",
+                            description = "Nenhum repositório encontrado para esse usuário"
+                        )
+                    }
+
+                    else -> {
+                        LazyColumn(
+                            modifier = Modifier
+                                .fillMaxSize()
+                                .padding(horizontal = LocalSpacing.current.medium),
+                            verticalArrangement = Arrangement.spacedBy(LocalSpacing.current.small)
+                        ) {
+                            items(
+                                count = repositories.itemCount,
+                                key = repositories.itemKey { it.id }
+                            ) { index ->
+                                repositories[index]?.let { repository ->
+                                    RepositoryItem(
+                                        name = repository.name,
+                                        description = repository.description,
+                                        language = repository.language,
+                                        onClick = { onRepositoryClick(repository) }
+                                    )
+                                }
+                            }
+                        }
                     }
                 }
             }
-        }
+        )
     }
-
 }
 
 @Composable

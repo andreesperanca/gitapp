@@ -11,9 +11,9 @@ interface RepoDao {
     @Upsert
     suspend fun upsertAll(repos: List<RepositoryEntity>)
 
-    @Query("SELECT * FROM repositories")
-    fun getAllRepositories(): PagingSource<Int, RepositoryEntity>
+    @Query("SELECT * FROM repositories WHERE userLogin = :userFilterText")
+    fun getAllRepositories(userFilterText: String): PagingSource<Int, RepositoryEntity>
 
-    @Query("DELETE FROM repositories")
-    suspend fun clearAll()
+    @Query("DELETE FROM repositories WHERE userLogin = :userLogin")
+    suspend fun clearAll(userLogin: String)
 }

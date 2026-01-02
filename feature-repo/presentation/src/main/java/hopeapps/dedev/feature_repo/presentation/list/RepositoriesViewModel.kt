@@ -7,14 +7,18 @@ import androidx.paging.PagingData
 import androidx.paging.cachedIn
 import hopeapps.dedev.feature_repo.domain.entity.Repository
 import hopeapps.dedev.feature_repo.domain.usecase.FetchRepositoryPaginatedUseCase
+import kotlinx.coroutines.Dispatchers
+import kotlinx.coroutines.flow.Flow
 import kotlinx.coroutines.flow.MutableStateFlow
+import kotlinx.coroutines.flow.collectLatest
+import kotlinx.coroutines.flow.flowOf
 import kotlinx.coroutines.launch
 
 class RepositoriesViewModel(
     private val searchRepositoryUseCase: FetchRepositoryPaginatedUseCase
 ) : ViewModel() {
 
-    var repoPagingFlow = MutableStateFlow<PagingData<Repository>>(PagingData.empty())
+    var repoPagingFlow = flowOf<PagingData<Repository>>(PagingData.empty())
         private set
 
     var userLogin: String = ""
@@ -29,12 +33,8 @@ class RepositoriesViewModel(
     }
 
     fun searchRepositories(userFilterText: String) {
-        viewModelScope.launch {
-            searchRepositoryUseCase(userFilterText)
-                .cachedIn(viewModelScope)
-                .collect {
-                    repoPagingFlow.value = it
-                }
-        }
+        repoPagingFlow = searchRepositoryUseCase
+            .invoke(userFilterText)
+            .cachedIn(viewModelScope)
     }
 }

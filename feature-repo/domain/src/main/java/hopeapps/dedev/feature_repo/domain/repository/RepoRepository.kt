@@ -1,10 +1,8 @@
 package hopeapps.dedev.feature_repo.domain.repository
 
-import androidx.paging.Pager
 import androidx.paging.PagingData
 import hopeapps.dedev.feature_repo.domain.entity.RepoSearchFilter
 import hopeapps.dedev.feature_repo.domain.entity.Repository
-import hopeapps.dedev.feature_repo.domain.entity.SearchResponse
 import kotlinx.coroutines.flow.Flow
 
 interface RepoRepository {
