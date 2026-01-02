@@ -3,6 +3,7 @@ package hopeapps.dedev.feature_users.presentation
 import androidx.lifecycle.ViewModel
 import androidx.lifecycle.viewModelScope
 import hopeapps.dedev.common.Result
+import hopeapps.dedev.common.launchSuspend
 import hopeapps.dedev.feature_users.domain.entity.User
 import hopeapps.dedev.feature_users.domain.usecase.FetchRecentUsersUseCase
 import hopeapps.dedev.feature_users.domain.usecase.SearchUserUseCase
@@ -27,7 +28,6 @@ class UserViewModel(
         fetchHistoricUsers()
     }
 
-
     fun onAction(action: UserAction) {
         when (action) {
             is UserAction.FilterClick -> handleFilterClick(action.userFilterText)
@@ -38,12 +38,26 @@ class UserViewModel(
     }
 
     private fun handleFilterClick(userFilterText: String) {
-        viewModelScope.launch(Dispatchers.IO) {
-            val response = searchUsersUseCase(userFilterText)
-            if (response is Result.Success) {
-                fetchHistoricUsers()
+        viewModelScope.launchSuspend(
+            block = {
+                searchUsersUseCase(userFilterText)
+            },
+            onLoading = { isLoading ->
+                state.update { state ->
+                    state.copy(
+                        isLoading = isLoading
+                    )
+                }
+            },
+            onResult = { response ->
+                if (response is Result.Error) {
+                    sendEvent(UserEvent.ShowSnackBar(message = "Error message!"))
+                }
+                if (response is Result.Success) {
+                    fetchHistoricUsers()
+                }
             }
-        }
+        )
     }
 
     private fun handleUpdateExpandedSearch(isExpandedSearch: Boolean) {

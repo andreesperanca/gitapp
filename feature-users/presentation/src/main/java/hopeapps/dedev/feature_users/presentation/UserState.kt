@@ -5,5 +5,6 @@ import hopeapps.dedev.feature_users.domain.entity.User
 data class UserState(
     val recentUsers: List<User> = mutableListOf(),
     val isSearchExpanded: Boolean = false,
-    val filterText: String = ""
+    val filterText: String = "",
+    val isLoading: Boolean = false
 )

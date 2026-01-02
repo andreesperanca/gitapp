@@ -1,6 +1,8 @@
 package hopeapps.dedev.core.presentation.designsystem.components
 
+import androidx.compose.foundation.clickable
 import androidx.compose.foundation.layout.fillMaxWidth
+import androidx.compose.foundation.layout.padding
 import androidx.compose.material.icons.Icons
 import androidx.compose.material.icons.rounded.Close
 import androidx.compose.material.icons.rounded.Search
@@ -14,6 +16,7 @@ import androidx.compose.material3.Text
 import androidx.compose.runtime.Composable
 import androidx.compose.ui.Modifier
 import androidx.compose.ui.unit.sp
+import hopeapps.dedev.core.presentation.designsystem.LocalSpacing
 
 @OptIn(ExperimentalMaterial3Api::class)
 @Composable
@@ -25,7 +28,8 @@ fun DefaultSearchBar(
     onExpandedChange: (Boolean) -> Unit,
     filterListener: (searchQuery: String) -> Unit,
     recentSearch: List<String>,
-    placeholder: String
+    placeholder: String,
+    onClickSuggestItem: (suggestItem: String) -> Unit = { }
 ) {
     SearchBar(
         modifier = modifier.fillMaxWidth(),
@@ -91,7 +95,15 @@ fun DefaultSearchBar(
         windowInsets = SearchBarDefaults.windowInsets,
         content = {
             recentSearch.forEach { item ->
-                Text(text = item, fontSize = 15.sp)
+                Text(
+                    modifier = Modifier
+                        .padding(horizontal = LocalSpacing.current.extraSmall)
+                        .clickable {
+                            onClickSuggestItem(item)
+                            onExpandedChange(false)
+                        },
+                    text = item, fontSize = 15.sp
+                )
             }
         }
     )

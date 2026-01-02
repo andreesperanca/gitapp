@@ -4,4 +4,5 @@ import hopeapps.dedev.feature_users.domain.entity.User
 
 interface UserEvent {
     data class UserSelected(val user: User) : UserEvent
+    data class ShowSnackBar(val message: String) : UserEvent
 }

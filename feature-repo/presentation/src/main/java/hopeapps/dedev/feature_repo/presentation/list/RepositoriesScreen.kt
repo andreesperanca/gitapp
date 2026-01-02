@@ -126,20 +126,6 @@ fun RepositoriesScreen(
 
 }
 
-private val fakeData = listOf(
-    Repository(
-        id = 1,
-        name = "",
-        description = "",
-        stars = 1,
-        forks = 1,
-        language = "",
-        lastUpdate = "",
-        isFork = false
-    )
-)
-
-
 @Composable
 @Preview(showBackground = true)
 fun UserScreenPreview() {
@@ -161,3 +147,16 @@ fun UserScreenPreview() {
         )
     }
 }
+
+private val fakeData = listOf(
+    Repository(
+        id = 1,
+        name = "",
+        description = "",
+        stars = 1,
+        forks = 1,
+        language = "",
+        lastUpdate = "",
+        isFork = false
+    )
+)
