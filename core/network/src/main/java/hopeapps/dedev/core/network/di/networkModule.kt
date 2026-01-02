@@ -17,7 +17,7 @@ val networkModule = module {
     single {
         OkHttpClient
             .Builder()
-            .addInterceptor(AuthInterceptor("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"))
+            .addInterceptor(AuthInterceptor("git_rebase"))
             .build()
     }
 

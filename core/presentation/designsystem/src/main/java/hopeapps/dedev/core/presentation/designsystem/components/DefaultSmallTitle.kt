@@ -11,18 +11,16 @@ import androidx.compose.ui.unit.sp
 
 
 @Composable
-fun DefaultText(
+fun DefaultSmallTitle(
     modifier: Modifier = Modifier,
-    text: String,
-    color: Color = MaterialTheme.colorScheme.onSurface,
-    maxLines: Int = 1
+    title: String,
+    color: Color = MaterialTheme.colorScheme.onBackground
 ) {
     Text(
         modifier = modifier.testTag("title_component"),
-        text = text,
+        text = title,
         color = color,
-        fontSize = 12.sp,
-        maxLines = maxLines,
+        fontSize = 16.sp,
         overflow = TextOverflow.Ellipsis
     )
 }

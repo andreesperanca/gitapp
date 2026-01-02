@@ -3,5 +3,7 @@ package hopeapps.dedev.feature_users.presentation
 import hopeapps.dedev.feature_users.domain.entity.User
 
 data class UserState(
-    val recentUsers: List<User> = emptyList()
+    val recentUsers: List<User> = mutableListOf(),
+    val isSearchExpanded: Boolean = false,
+    val filterText: String = ""
 )

@@ -4,7 +4,7 @@ import hopeapps.dedev.core.database.model.UserEntity
 import hopeapps.dedev.core.network.models.UserDto
 import hopeapps.dedev.feature_users.domain.entity.User
 
-fun UserDto.toUser(): User {
+fun UserDto.toDomain(): User {
     return User(
         login = login,
         avatarUrl = avatarUrl,
@@ -16,8 +16,22 @@ fun UserDto.toUser(): User {
     )
 }
 
+fun UserDto.toEntity(): UserEntity {
+    return UserEntity(
+        id = id,
+        login = login,
+        avatarUrl = avatarUrl,
+        name = name ?: "",
+        followers = followers,
+        following = following,
+        bio = bio ?: "",
+        publicRepos = publicRepos,
+    )
+}
+
+
 fun List<UserDto>.dtoToUsers(): List<User> {
-    return map { it.toUser() }
+    return map { it.toDomain() }
 }
 
 

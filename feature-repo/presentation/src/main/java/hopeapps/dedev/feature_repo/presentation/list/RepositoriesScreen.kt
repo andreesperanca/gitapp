@@ -26,7 +26,8 @@ import org.koin.androidx.compose.koinViewModel
 
 @Composable
 fun RepositoriesScreenRoot(
-    viewModel: RepositoriesViewModel = koinViewModel()
+    viewModel: RepositoriesViewModel = koinViewModel(),
+    userLogin: String
 ) {
     val state by viewModel.state.collectAsStateWithLifecycle()
     val repositories = viewModel.repoPagingFlow.collectAsLazyPagingItems()

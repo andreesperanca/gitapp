@@ -46,10 +46,12 @@ import org.koin.compose.viewmodel.koinViewModel
 
 @Composable
 fun SearchRepositoriesScreenRoot(
+    userLogin: String,
     viewModel: RepoSearchViewModel = koinViewModel()
 ) {
 //    val state by viewModel.state.collectAsStateWithLifecycle()
     val repositories = viewModel.repoPagingFlow.collectAsLazyPagingItems()
+    viewModel.init(userLogin)
 
     RepositorySearchScreen(
         onAction = viewModel::onAction,

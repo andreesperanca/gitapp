@@ -3,4 +3,6 @@
     <string name="search_repositories">Linguagem</string>
     <string name="repositories">Repositórios</string>
     <string name="search_title">Buscar</string>
+    <string name="follows">Seguidores</string>
+    <string name="following">Seguindo</string>
 </resources>

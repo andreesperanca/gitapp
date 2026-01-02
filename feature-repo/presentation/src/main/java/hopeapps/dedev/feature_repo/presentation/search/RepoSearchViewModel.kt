@@ -21,15 +21,22 @@ class RepoSearchViewModel(
     var repoPagingFlow = MutableStateFlow<PagingData<Repository>>(PagingData.empty())
         private set
 
-    var repoSearchFilter = MutableStateFlow(RepoSearchFilter(user = "android"))
+    var repoSearchFilter = MutableStateFlow(RepoSearchFilter())
         private set
+
+    fun init(userLogin: String) {
+        repoSearchFilter.update { repoSearchFilter ->
+            repoSearchFilter
+                .copy(user = userLogin)
+        }
+        searchRepositories(repoSearchFilter.value)
+    }
 
     fun onAction(action: RepoSearchAction) {
         when (action) {
 
             is RepoSearchAction.OnSearchClick -> {
                 searchRepositories(
-                    userFilterText = action.filterText,
                     filter = repoSearchFilter.value
                 )
             }
@@ -75,15 +82,13 @@ class RepoSearchViewModel(
         }
     }
 
-    init {
-        searchRepositories("android", filter = RepoSearchFilter(user = "android"))
-    }
 
-    fun searchRepositories(userFilterText: String, filter: RepoSearchFilter) {
+
+    fun searchRepositories(filter: RepoSearchFilter) {
         viewModelScope.launch {
             searchRepositoryPaginatedUseCase(
                 filter = filter,
-                userFilterText = userFilterText
+                userFilterText = repoSearchFilter.value.user ?: "andreesperanca"
             ).cachedIn(viewModelScope)
                 .collect { searchResponse ->
                     repoPagingFlow.value = searchResponse

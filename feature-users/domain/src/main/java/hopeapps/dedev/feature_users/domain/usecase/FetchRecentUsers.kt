@@ -1,5 +1,6 @@
 package hopeapps.dedev.feature_users.domain.usecase
 
+import hopeapps.dedev.common.Result
 import hopeapps.dedev.feature_users.domain.entity.User
 import hopeapps.dedev.feature_users.domain.repository.UserRepository
 
@@ -10,16 +11,8 @@ class FetchRecentUsersUseCase(
 
     suspend operator fun invoke(
         userFilterText: String = ""
-    ): List<User> {
-
+    ): Result<List<User>> {
         val users = userRepository.fetchRecentUsers()
-
-        if (userFilterText.isEmpty()) {
-            return users
-        }
-
-        return users.filter { user ->
-            user.login.contains(userFilterText)
-        }
+        return users
     }
 }

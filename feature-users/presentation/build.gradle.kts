@@ -57,4 +57,5 @@ dependencies {
     //Modules
     implementation(project(":feature-users:domain"))
     implementation(project(":core:presentation:designsystem"))
+    implementation(project(":core:common"))
 }

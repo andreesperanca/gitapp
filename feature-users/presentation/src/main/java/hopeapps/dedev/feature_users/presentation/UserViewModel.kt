@@ -2,6 +2,8 @@ package hopeapps.dedev.feature_users.presentation
 
 import androidx.lifecycle.ViewModel
 import androidx.lifecycle.viewModelScope
+import hopeapps.dedev.common.Result
+import hopeapps.dedev.feature_users.domain.entity.User
 import hopeapps.dedev.feature_users.domain.usecase.FetchRecentUsersUseCase
 import hopeapps.dedev.feature_users.domain.usecase.SearchUserUseCase
 import kotlinx.coroutines.Dispatchers
@@ -22,32 +24,68 @@ class UserViewModel(
         private set
 
     init {
-        viewModelScope.launch(Dispatchers.IO) {
-            state.update { state ->
-                state.copy(
-                    recentUsers = fetchRecentUsers()
-                )
-            }
-        }
+        fetchHistoricUsers()
     }
 
 
     fun onAction(action: UserAction) {
-        when(action) {
+        when (action) {
             is UserAction.FilterClick -> handleFilterClick(action.userFilterText)
+            is UserAction.ExpandedSearchClick -> handleUpdateExpandedSearch(action.boolean)
+            is UserAction.UpdateFilterText -> handleUpdateFilterText(action.userFilterText)
+            is UserAction.SelectedUser -> handleSelectedUser(action.user)
         }
     }
 
     private fun handleFilterClick(userFilterText: String) {
         viewModelScope.launch(Dispatchers.IO) {
-            val user = searchUsersUseCase(userFilterText)
-            state.update { state ->
-                state.copy(
-                    recentUsers = state.recentUsers + user
-                )
+            val response = searchUsersUseCase(userFilterText)
+            if (response is Result.Success) {
+                fetchHistoricUsers()
             }
-
         }
     }
 
+    private fun handleUpdateExpandedSearch(isExpandedSearch: Boolean) {
+        viewModelScope.launch(Dispatchers.IO) {
+            state.update { state ->
+                state.copy(
+                    isSearchExpanded = isExpandedSearch
+                )
+            }
+        }
+    }
+
+    private fun handleUpdateFilterText(userFilterText: String) {
+        viewModelScope.launch(Dispatchers.IO) {
+            state.update { state ->
+                state.copy(
+                    filterText = userFilterText
+                )
+            }
+        }
+    }
+
+    private fun handleSelectedUser(user: User) {
+        sendEvent(UserEvent.UserSelected(user))
+    }
+
+    private fun sendEvent(newEvent: UserEvent) {
+        viewModelScope.launch {
+            event.emit(newEvent)
+        }
+    }
+
+    private fun fetchHistoricUsers() {
+        viewModelScope.launch(Dispatchers.IO) {
+            val response = fetchRecentUsers()
+            if (response is Result.Success) {
+                state.update { state ->
+                    state.copy(
+                        recentUsers = response.data
+                    )
+                }
+            }
+        }
+    }
 }
