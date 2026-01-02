@@ -79,6 +79,10 @@ class RepoSearchViewModel(
                         )
                 }
             }
+
+            is RepoSearchAction.OnRepositorySelected -> {
+
+            }
         }
     }
 

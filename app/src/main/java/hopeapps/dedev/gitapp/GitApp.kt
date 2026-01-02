@@ -22,11 +22,9 @@ class GitApp() : Application() {
                 databaseModule,
                 networkModule,
                 apiModule,
-                // Esse módulo deve ir para a feature depois
                 featureUsers,
                 featureRepo
             )
         }
     }
-
 }

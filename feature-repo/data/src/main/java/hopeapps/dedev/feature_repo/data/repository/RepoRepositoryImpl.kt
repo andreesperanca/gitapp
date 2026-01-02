@@ -7,21 +7,17 @@ import androidx.paging.PagingData
 import androidx.paging.map
 import hopeapps.dedev.core.database.AppDatabase
 import hopeapps.dedev.core.network.GitApi
-import hopeapps.dedev.feature_repo.data.datasource.RepoRemoteDataSource
 import hopeapps.dedev.feature_repo.data.datasource.RepoRemoteMediator
-import hopeapps.dedev.feature_repo.data.mapper.toApiValue
 import hopeapps.dedev.feature_repo.data.mapper.toRepository
 import hopeapps.dedev.feature_repo.data.paging.SearchPagingSource
 import hopeapps.dedev.feature_repo.domain.entity.RepoSearchFilter
 import hopeapps.dedev.feature_repo.domain.entity.Repository
-import hopeapps.dedev.feature_repo.domain.entity.SearchResponse
 import hopeapps.dedev.feature_repo.domain.repository.RepoRepository
 import kotlinx.coroutines.flow.Flow
 import kotlinx.coroutines.flow.map
 
 @OptIn(ExperimentalPagingApi::class)
 class RepoRepositoryImpl(
-    private val repoRemoteDataSource: RepoRemoteDataSource,
     private val gitApi: GitApi,
     private val db: AppDatabase
 ) : RepoRepository {
@@ -61,5 +57,4 @@ class RepoRepositoryImpl(
             }
         ).flow
     }
-
 }

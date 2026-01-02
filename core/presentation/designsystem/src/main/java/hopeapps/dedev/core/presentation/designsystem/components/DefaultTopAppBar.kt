@@ -3,7 +3,6 @@ package hopeapps.dedev.core.presentation.designsystem.components
 import androidx.compose.foundation.layout.RowScope
 import androidx.compose.material3.ExperimentalMaterial3Api
 import androidx.compose.material3.MaterialTheme
-import androidx.compose.material3.Text
 import androidx.compose.material3.TopAppBar
 import androidx.compose.material3.TopAppBarDefaults
 import androidx.compose.runtime.Composable
@@ -20,9 +19,9 @@ fun DefaultTopAppBar(
     TopAppBar(
         modifier = modifier,
         title = {
-            Text(
-                text = title,
-                style = MaterialTheme.typography.titleLarge,
+            DefaultTitle(
+                modifier = Modifier,
+                title = title,
                 color = MaterialTheme.colorScheme.onSurface
             )
         },

@@ -17,9 +17,7 @@ val featureUsers = module {
     single<UserRepository> { UserRepositoryImpl(get(), get()) }
     single<LocalDataSource> { LocalDataSourceImpl(get()) }
     single<RemoteDataSource> { RemoteDataSourceImpl(get()) }
-
     single<SearchUserUseCase> { SearchUserUseCase(get() ) }
     single<FetchRecentUsersUseCase> { FetchRecentUsersUseCase(get() ) }
-
     viewModelOf(::UserViewModel)
 }

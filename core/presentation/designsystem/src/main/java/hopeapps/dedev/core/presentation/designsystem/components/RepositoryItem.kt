@@ -20,6 +20,7 @@ import hopeapps.dedev.core.presentation.designsystem.LocalSpacing
 
 @Composable
 fun RepositoryItem(
+    onClick: () -> Unit = {},
     name: String,
     description: String?,
     language: String?,
@@ -37,22 +38,18 @@ fun RepositoryItem(
             modifier = Modifier.padding(LocalSpacing.current.small)
         ) {
 
-            Text(
-                text = name,
-                style = MaterialTheme.typography.titleMedium,
-                color = MaterialTheme.colorScheme.onSurface,
+            DefaultTitle(
+                title = name,
                 maxLines = 1,
-                overflow = TextOverflow.Ellipsis
+                color = MaterialTheme.colorScheme.onSurface
             )
 
             if (!description.isNullOrBlank()) {
                 Spacer(modifier = Modifier.height(LocalSpacing.current.extraSmall))
-                Text(
+                DefaultText(
                     text = description,
-                    style = MaterialTheme.typography.bodyMedium,
-                    color = MaterialTheme.colorScheme.onSurfaceVariant,
                     maxLines = 2,
-                    overflow = TextOverflow.Ellipsis
+                    color = MaterialTheme.colorScheme.onSurfaceVariant
                 )
             }
 
@@ -81,9 +78,8 @@ private fun RepoInfoItem(
     ) {
         DotIndicator()
 
-        Text(
+        DefaultText(
             text = text,
-            style = MaterialTheme.typography.labelMedium,
             color = MaterialTheme.colorScheme.onSurfaceVariant
         )
     }

@@ -150,7 +150,7 @@ fun UserDetailsItem(
 
                 IconButton(onClick = { isMoreInfoVisible = !isMoreInfoVisible }) {
                     Icon(
-                        imageVector = if (isMoreInfoVisible) Icons.Default.KeyboardArrowDown else Icons.Default.KeyboardArrowUp,
+                        imageVector = if (isMoreInfoVisible) Icons.Default.KeyboardArrowUp else Icons.Default.KeyboardArrowDown,
                         contentDescription = null,
                         tint = MaterialTheme.colorScheme.onSurfaceVariant
                     )

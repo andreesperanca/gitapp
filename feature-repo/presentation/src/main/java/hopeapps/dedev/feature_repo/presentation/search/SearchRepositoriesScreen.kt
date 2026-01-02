@@ -53,7 +53,7 @@ fun SearchRepositoriesScreenRoot(
     val repositories = viewModel.repoPagingFlow.collectAsLazyPagingItems()
     viewModel.init(userLogin)
 
-    RepositorySearchScreen(
+    SearchRepositoriesScreen(
         onAction = viewModel::onAction,
         repositories
     )
@@ -61,7 +61,7 @@ fun SearchRepositoriesScreenRoot(
 
 @OptIn(ExperimentalMaterial3Api::class)
 @Composable
-fun RepositorySearchScreen(
+fun SearchRepositoriesScreen(
     onAction: (RepoSearchAction) -> Unit,
     repositories: LazyPagingItems<Repository>
 ) {

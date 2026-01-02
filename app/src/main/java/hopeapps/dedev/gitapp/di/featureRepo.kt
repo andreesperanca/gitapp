@@ -19,14 +19,10 @@ import org.koin.dsl.module
 
 @OptIn(ExperimentalPagingApi::class)
 val featureRepo = module {
-    single<RepoRepository> { RepoRepositoryImpl(get(), get(), get()) }
+    single<RepoRepository> { RepoRepositoryImpl(get(), get()) }
     single<RepoRemoteDataSource> { RepoRemoteDataSourceImpl(get()) }
-//    single<RepoLocalDataSource> { RepoLocalDataSourceIm(get()) }
-
     single<FetchRepositoryPaginatedUseCase> { FetchRepositoryPaginatedUseCase(get() ) }
     single<SearchRepositoryPaginatedUseCase> { SearchRepositoryPaginatedUseCase(get() )}
-
     viewModelOf(::RepositoriesViewModel)
     viewModelOf(::RepoSearchViewModel)
-
 }

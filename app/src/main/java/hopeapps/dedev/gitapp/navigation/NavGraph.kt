@@ -20,8 +20,8 @@ fun SetupNavGraph(navController: NavHostController) {
 
         composable(route = Screen.UserScreen.route) {
             UserScreenRoot(
-                navigateToUserDetails = { user ->
-                    navController.navigate(Screen.RepositoriesScreen.createRoute(loginUser = user))
+                navigateToUserDetails = { userLogin ->
+                    navController.navigate(Screen.RepositoriesScreen.createRoute(userLogin = userLogin))
                 }
             )
         }
@@ -34,11 +34,16 @@ fun SetupNavGraph(navController: NavHostController) {
                 }
             )
         ) { backStackEntry ->
-
-            val login = backStackEntry.arguments?.getString("login") ?: error("login argument is required")
-
+            val userLogin = backStackEntry.arguments?.getString("login") ?: "andreesperanca"
             RepositoriesScreenRoot(
-                userLogin = login
+                userLogin = userLogin,
+                navigateToSearchRepositories = { userLogin ->
+                    navController.navigate(Screen.SearchRepositoriesScreen.createRoute(userLogin = userLogin))
+                },
+                navigateToRepositoryDetails = {
+
+                },
+                backButtonListener = { navController.popBackStack() }
             )
         }
 
@@ -50,10 +55,7 @@ fun SetupNavGraph(navController: NavHostController) {
                 }
             )
         ) { backStackEntry ->
-
-            val login = backStackEntry.arguments?.getString("login")
-                ?: error("login argument is required")
-
+            val login = backStackEntry.arguments?.getString("login") ?: "andreesperanca"
             SearchRepositoriesScreenRoot(
                 userLogin = login
             )
