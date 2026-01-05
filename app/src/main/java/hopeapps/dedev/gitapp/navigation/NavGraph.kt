@@ -57,7 +57,10 @@ fun SetupNavGraph(navController: NavHostController) {
         ) { backStackEntry ->
             val login = backStackEntry.arguments?.getString("login") ?: "andreesperanca"
             SearchRepositoriesScreenRoot(
-                userLogin = login
+                userLogin = login,
+                onBackListener = {
+                    navController.popBackStack()
+                }
             )
         }
     }

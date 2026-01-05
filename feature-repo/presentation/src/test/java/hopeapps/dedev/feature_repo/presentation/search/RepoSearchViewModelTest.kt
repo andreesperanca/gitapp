@@ -59,9 +59,7 @@ class RepoSearchViewModelTest {
     fun `UpdateSortFilter Stars should update filter`() = runTest {
         viewModel = RepoSearchViewModel(useCase)
 
-        viewModel.onAction(
-            RepoSearchAction.UpdateSortFilter(RepoSort.Stars)
-        )
+        viewModel.updateSortFilter(RepoSort.Stars)
 
         assertEquals(
             RepoSort.Stars,

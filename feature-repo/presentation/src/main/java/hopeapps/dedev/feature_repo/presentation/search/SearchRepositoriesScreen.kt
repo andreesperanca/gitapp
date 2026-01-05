@@ -10,12 +10,16 @@ import androidx.compose.foundation.layout.fillMaxSize
 import androidx.compose.foundation.layout.fillMaxWidth
 import androidx.compose.foundation.layout.padding
 import androidx.compose.foundation.lazy.LazyColumn
+import androidx.compose.material.icons.Icons
+import androidx.compose.material.icons.automirrored.filled.ArrowBack
 import androidx.compose.material3.Button
 import androidx.compose.material3.Card
 import androidx.compose.material3.CardDefaults
 import androidx.compose.material3.CircularProgressIndicator
 import androidx.compose.material3.ExperimentalMaterial3Api
 import androidx.compose.material3.HorizontalDivider
+import androidx.compose.material3.Icon
+import androidx.compose.material3.IconButton
 import androidx.compose.material3.MaterialTheme
 import androidx.compose.material3.Scaffold
 import androidx.compose.material3.Switch
@@ -38,6 +42,7 @@ import hopeapps.dedev.core.presentation.designsystem.components.ChipSelector
 import hopeapps.dedev.core.presentation.designsystem.components.DefaultSearchBar
 import hopeapps.dedev.core.presentation.designsystem.components.DefaultText
 import hopeapps.dedev.core.presentation.designsystem.components.DefaultTitle
+import hopeapps.dedev.core.presentation.designsystem.components.DefaultTopAppBar
 import hopeapps.dedev.core.presentation.designsystem.components.EmptyState
 import hopeapps.dedev.core.presentation.designsystem.components.ErrorState
 import hopeapps.dedev.core.presentation.designsystem.components.RepositoryItem
@@ -47,23 +52,22 @@ import org.koin.compose.viewmodel.koinViewModel
 
 @Composable
 fun SearchRepositoriesScreenRoot(
-    userLogin: String,
-    viewModel: RepoSearchViewModel = koinViewModel()
+    userLogin: String, viewModel: RepoSearchViewModel = koinViewModel(), onBackListener: () -> Unit
 ) {
     val repositories = viewModel.repoPagingFlow.collectAsLazyPagingItems()
     viewModel.init(userLogin)
 
     SearchRepositoriesScreen(
-        onAction = viewModel::onAction,
-        repositories
+        viewModel, repositories, onBackListener
     )
 }
 
 @OptIn(ExperimentalMaterial3Api::class)
 @Composable
 fun SearchRepositoriesScreen(
-    onAction: (RepoSearchAction) -> Unit,
-    repositories: LazyPagingItems<Repository>
+    viewModel: RepoSearchViewModel,
+    repositories: LazyPagingItems<Repository>,
+    onBackListener: () -> Unit
 ) {
 
     var filterText by rememberSaveable { mutableStateOf("") }
@@ -72,11 +76,20 @@ fun SearchRepositoriesScreen(
     var selected by rememberSaveable { mutableStateOf(RepoSort.Updated) }
 
     Scaffold(
-        modifier = Modifier.fillMaxSize(),
-        topBar = {
-            // Voltar e título com o nome do usuário
-        }
-    ) {
+        modifier = Modifier.fillMaxSize(), topBar = {
+            DefaultTopAppBar(
+                title = stringResource(R.string.filter_title), navigationIcon = {
+                    IconButton(onClick = {
+                        onBackListener()
+                    }) {
+                        Icon(
+                            imageVector = Icons.AutoMirrored.Filled.ArrowBack,
+                            contentDescription = null,
+                            tint = MaterialTheme.colorScheme.onSurfaceVariant
+                        )
+                    }
+                })
+        }) {
         Column(
             modifier = Modifier
                 .fillMaxSize()
@@ -85,30 +98,26 @@ fun SearchRepositoriesScreen(
         ) {
 
             DefaultSearchBar(
-                modifier = Modifier
-                    .fillMaxWidth(),
+                modifier = Modifier.fillMaxWidth(),
                 placeHolder = stringResource(R.string.search_repositories),
                 onSearch = {
 
                 },
                 onQueryChange = { newQuery ->
                     filterText = newQuery
-                    onAction(RepoSearchAction.UpdatedLanguageFilter(languageFilter = newQuery))
+                    viewModel.updateLanguageFilter(filterText)
                 },
                 onSettingClick = {
                     isVisibleFilters = !isVisibleFilters
-                }
-            )
+                })
 
             Button(
                 modifier = Modifier
                     .fillMaxWidth()
                     .padding(horizontal = LocalSpacing.current.medium)
-                    .align(Alignment.CenterHorizontally),
-                onClick = {
-                    onAction(RepoSearchAction.OnSearchClick(filterText))
-                }
-            ) {
+                    .align(Alignment.CenterHorizontally), onClick = {
+                    viewModel.filterItems()
+                }) {
                 Text(text = stringResource(R.string.search_title))
             }
 
@@ -132,12 +141,10 @@ fun SearchRepositoriesScreen(
                         )
 
                         Switch(
-                            checked = isOnlyFork,
-                            onCheckedChange = { isChecked ->
+                            checked = isOnlyFork, onCheckedChange = { isChecked ->
                                 isOnlyFork = isChecked
-                                onAction(RepoSearchAction.UpdatedForkFilterType(isOnlyFork = isChecked))
-                            }
-                        )
+                                viewModel.updateForkFilterType(isOnlyFork)
+                            })
                     }
 
                     DefaultText(
@@ -150,13 +157,12 @@ fun SearchRepositoriesScreen(
                         options = RepoSort.entries,
                         onOptionSelected = { optionSelected ->
                             selected = optionSelected
-                            onAction(RepoSearchAction.UpdateSortFilter(orderByFilter = optionSelected))
+                            viewModel.updateSortFilter(selected)
                         },
                         selectedOption = selected,
                         labelMapper = { label ->
                             label.mapToLabel()
-                        }
-                    )
+                        })
                 }
             }
 
@@ -171,8 +177,7 @@ fun SearchRepositoriesScreen(
 
             DefaultTitle(
                 modifier = Modifier.padding(
-                    horizontal = LocalSpacing.current.medium,
-                    vertical = LocalSpacing.current.small
+                    horizontal = LocalSpacing.current.medium, vertical = LocalSpacing.current.small
                 ),
                 title = stringResource(R.string.repositories),
                 color = MaterialTheme.colorScheme.onBackground
@@ -183,8 +188,7 @@ fun SearchRepositoriesScreen(
 
                 is LoadState.Loading -> {
                     Box(
-                        modifier = Modifier.fillMaxSize(),
-                        contentAlignment = Alignment.Center
+                        modifier = Modifier.fillMaxSize(), contentAlignment = Alignment.Center
                     ) {
                         CircularProgressIndicator()
                     }
@@ -193,7 +197,8 @@ fun SearchRepositoriesScreen(
                 is LoadState.Error -> {
                     ErrorState(
                         modifier = Modifier.padding(horizontal = LocalSpacing.current.large),
-                        message = state.error.message ?: stringResource(hopeapps.dedev.feature_repo.presentation.R.string.error_message)
+                        message = state.error.message
+                            ?: stringResource(hopeapps.dedev.feature_repo.presentation.R.string.error_message)
                     )
                 }
 
@@ -213,8 +218,7 @@ fun SearchRepositoriesScreen(
                         ) {
                             items(
                                 count = repositories.itemCount,
-                                key = repositories.itemKey { item -> item.id }
-                            ) { index ->
+                                key = repositories.itemKey { item -> item.id }) { index ->
                                 repositories[index]?.let { repository ->
                                     RepositoryItem(
                                         name = repository.name,
