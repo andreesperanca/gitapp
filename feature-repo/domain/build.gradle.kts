@@ -24,4 +24,10 @@ kotlin {
 }
 dependencies {
     testImplementation(kotlin("test"))
+    //Tests
+    testImplementation(libs.mockk)
+    testImplementation(libs.kotlinx.coroutines.test)
+    testImplementation(libs.turbine)
+    testImplementation(libs.androidx.paging.common)
+    testImplementation(libs.junit)
 }
