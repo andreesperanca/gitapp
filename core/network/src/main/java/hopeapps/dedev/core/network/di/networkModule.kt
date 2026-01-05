@@ -2,6 +2,7 @@ package hopeapps.dedev.core.network.di
 
 import com.google.gson.GsonBuilder
 import hopeapps.dedev.core.network.AuthInterceptor
+import hopeapps.dedev.core.network.BuildConfig
 import okhttp3.OkHttpClient
 import org.koin.dsl.module
 import retrofit2.Retrofit
@@ -17,7 +18,7 @@ val networkModule = module {
     single {
         OkHttpClient
             .Builder()
-            .addInterceptor(AuthInterceptor("git_rebase"))
+            .addInterceptor(AuthInterceptor(BuildConfig.NETWORK_KEY))
             .build()
     }
 
