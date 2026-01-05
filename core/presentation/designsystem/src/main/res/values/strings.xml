@@ -6,4 +6,5 @@
     <string name="follows">Seguidores</string>
     <string name="following">Seguindo</string>
     <string name="filter_title">Filtrar repositórios</string>
+    <string name="error_message">Algo deu errado</string>
 </resources>

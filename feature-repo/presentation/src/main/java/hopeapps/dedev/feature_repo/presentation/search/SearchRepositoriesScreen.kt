@@ -5,11 +5,14 @@ import androidx.compose.foundation.background
 import androidx.compose.foundation.layout.Arrangement
 import androidx.compose.foundation.layout.Box
 import androidx.compose.foundation.layout.Column
+import androidx.compose.foundation.layout.PaddingValues
 import androidx.compose.foundation.layout.Row
 import androidx.compose.foundation.layout.fillMaxSize
 import androidx.compose.foundation.layout.fillMaxWidth
+import androidx.compose.foundation.layout.navigationBarsPadding
 import androidx.compose.foundation.layout.padding
 import androidx.compose.foundation.lazy.LazyColumn
+import androidx.compose.foundation.lazy.rememberLazyListState
 import androidx.compose.material.icons.Icons
 import androidx.compose.material.icons.automirrored.filled.ArrowBack
 import androidx.compose.material3.Button
@@ -25,6 +28,7 @@ import androidx.compose.material3.Scaffold
 import androidx.compose.material3.Switch
 import androidx.compose.material3.Text
 import androidx.compose.runtime.Composable
+import androidx.compose.runtime.LaunchedEffect
 import androidx.compose.runtime.getValue
 import androidx.compose.runtime.mutableStateOf
 import androidx.compose.runtime.saveable.rememberSaveable
@@ -32,6 +36,7 @@ import androidx.compose.runtime.setValue
 import androidx.compose.ui.Alignment
 import androidx.compose.ui.Modifier
 import androidx.compose.ui.res.stringResource
+import androidx.compose.ui.unit.dp
 import androidx.paging.LoadState
 import androidx.paging.compose.LazyPagingItems
 import androidx.paging.compose.collectAsLazyPagingItems
@@ -55,7 +60,10 @@ fun SearchRepositoriesScreenRoot(
     userLogin: String, viewModel: RepoSearchViewModel = koinViewModel(), onBackListener: () -> Unit
 ) {
     val repositories = viewModel.repoPagingFlow.collectAsLazyPagingItems()
-    viewModel.init(userLogin)
+
+    LaunchedEffect(userLogin) {
+        viewModel.init(userLogin)
+    }
 
     SearchRepositoriesScreen(
         viewModel, repositories, onBackListener
@@ -74,6 +82,7 @@ fun SearchRepositoriesScreen(
     var isOnlyFork by rememberSaveable { mutableStateOf(false) }
     var isVisibleFilters by rememberSaveable { mutableStateOf(false) }
     var selected by rememberSaveable { mutableStateOf(RepoSort.Updated) }
+    val listState = rememberLazyListState()
 
     Scaffold(
         modifier = Modifier.fillMaxSize(), topBar = {
@@ -183,42 +192,53 @@ fun SearchRepositoriesScreen(
                 color = MaterialTheme.colorScheme.onBackground
             )
 
+            LazyColumn(
+                modifier = Modifier
+                    .fillMaxSize()
+                    .navigationBarsPadding(),
+                contentPadding = PaddingValues(
+                    horizontal = LocalSpacing.current.medium,
+                    vertical = 8.dp
+                ),
+                verticalArrangement = Arrangement.spacedBy(LocalSpacing.current.small),
+                state = listState
+            ) {
 
-            when (val state = repositories.loadState.refresh) {
-
-                is LoadState.Loading -> {
-                    Box(
-                        modifier = Modifier.fillMaxSize(), contentAlignment = Alignment.Center
-                    ) {
-                        CircularProgressIndicator()
+                when (repositories.loadState.refresh) {
+                    is LoadState.Loading -> {
+                        item {
+                            Box(
+                                modifier = Modifier.fillParentMaxSize(),
+                                contentAlignment = Alignment.Center
+                            ) {
+                                CircularProgressIndicator()
+                            }
+                        }
                     }
-                }
 
-                is LoadState.Error -> {
-                    ErrorState(
-                        modifier = Modifier.padding(horizontal = LocalSpacing.current.large),
-                        message = state.error.message
-                            ?: stringResource(hopeapps.dedev.feature_repo.presentation.R.string.error_message)
-                    )
-                }
+                    is LoadState.Error -> {
+                        item {
+                            ErrorState(
+                                modifier = Modifier.padding(LocalSpacing.current.large),
+                                message = stringResource(R.string.error_message)
+                            )
+                        }
+                    }
 
-                is LoadState.NotLoading -> {
-                    if (repositories.itemCount == 0) {
-                        EmptyState(
-                            modifier = Modifier.padding(horizontal = LocalSpacing.current.large),
-                            message = stringResource(hopeapps.dedev.feature_repo.presentation.R.string.no_found_repositories),
-                            description = stringResource(hopeapps.dedev.feature_repo.presentation.R.string.try_modifier_filters)
-                        )
-                    } else {
-                        LazyColumn(
-                            modifier = Modifier
-                                .fillMaxSize()
-                                .padding(horizontal = LocalSpacing.current.medium),
-                            verticalArrangement = Arrangement.spacedBy(LocalSpacing.current.small)
-                        ) {
+                    is LoadState.NotLoading -> {
+                        if (repositories.itemCount == 0) {
+                            item {
+                                EmptyState(
+                                    modifier = Modifier.padding(horizontal = LocalSpacing.current.large),
+                                    message = stringResource(hopeapps.dedev.feature_repo.presentation.R.string.no_found_repositories),
+                                    description = stringResource(hopeapps.dedev.feature_repo.presentation.R.string.try_modifier_filters)
+                                )
+                            }
+                        } else {
                             items(
                                 count = repositories.itemCount,
-                                key = repositories.itemKey { item -> item.id }) { index ->
+                                key = repositories.itemKey { it.id }
+                            ) { index ->
                                 repositories[index]?.let { repository ->
                                     RepositoryItem(
                                         name = repository.name,

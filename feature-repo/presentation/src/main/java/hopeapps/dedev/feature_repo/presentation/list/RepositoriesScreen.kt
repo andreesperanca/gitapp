@@ -2,20 +2,28 @@ package hopeapps.dedev.feature_repo.presentation.list
 
 
 import androidx.compose.foundation.layout.Arrangement
+import androidx.compose.foundation.layout.Box
+import androidx.compose.foundation.layout.PaddingValues
 import androidx.compose.foundation.layout.fillMaxSize
+import androidx.compose.foundation.layout.navigationBarsPadding
 import androidx.compose.foundation.layout.padding
 import androidx.compose.foundation.lazy.LazyColumn
+import androidx.compose.foundation.lazy.rememberLazyListState
 import androidx.compose.material.icons.Icons
 import androidx.compose.material.icons.automirrored.filled.ArrowBack
 import androidx.compose.material.icons.filled.Search
+import androidx.compose.material3.CircularProgressIndicator
 import androidx.compose.material3.Icon
 import androidx.compose.material3.IconButton
 import androidx.compose.material3.MaterialTheme
 import androidx.compose.material3.Scaffold
 import androidx.compose.runtime.Composable
+import androidx.compose.runtime.LaunchedEffect
+import androidx.compose.ui.Alignment
 import androidx.compose.ui.Modifier
 import androidx.compose.ui.res.stringResource
 import androidx.compose.ui.tooling.preview.Preview
+import androidx.compose.ui.unit.dp
 import androidx.paging.LoadState
 import androidx.paging.PagingData
 import androidx.paging.compose.LazyPagingItems
@@ -35,13 +43,15 @@ import org.koin.androidx.compose.koinViewModel
 
 @Composable
 fun RepositoriesScreenRoot(
-    viewModel: RepositoriesViewModel = koinViewModel(),
     userLogin: String,
+    viewModel: RepositoriesViewModel = koinViewModel(),
     navigateToSearchRepositories: (userLogin: String) -> Unit,
     navigateToRepositoryDetails: (repository: Repository) -> Unit,
     backButtonListener: () -> Unit
 ) {
-    viewModel.init(userLogin)
+    LaunchedEffect(true) {
+        viewModel.init(userLogin)
+    }
     val repositories = viewModel.repoPagingFlow.collectAsLazyPagingItems()
 
     RepositoriesScreen(
@@ -68,7 +78,7 @@ fun RepositoriesScreen(
 ) {
 
     val pagerState = repositories.loadState
-
+    val listState = rememberLazyListState()
     Scaffold(
         topBar = {
             DefaultTopAppBar(
@@ -105,42 +115,60 @@ fun RepositoriesScreen(
                 .fillMaxSize(),
             isLoading = pagerState.refresh is LoadState.Loading,
             content = {
-                val loadState = repositories.loadState
+                LazyColumn(
+                    modifier = Modifier
+                        .fillMaxSize()
+                        .navigationBarsPadding(),
+                    contentPadding = PaddingValues(
+                        horizontal = LocalSpacing.current.medium,
+                        vertical = 8.dp
+                    ),
+                    verticalArrangement = Arrangement.spacedBy(LocalSpacing.current.small),
+                    state = listState
+                ) {
 
-                when {
-                    loadState.refresh is LoadState.Error && repositories.itemCount == 0 -> {
-                        ErrorState(
-                            modifier = Modifier.padding(horizontal = LocalSpacing.current.large),
-                            message = stringResource(hopeapps.dedev.feature_repo.presentation.R.string.without_connection)
-                        )
-                    }
+                    when (repositories.loadState.refresh) {
+                        is LoadState.Loading -> {
+                            item {
+                                Box(
+                                    modifier = Modifier.fillParentMaxSize(),
+                                    contentAlignment = Alignment.Center
+                                ) {
+                                    CircularProgressIndicator()
+                                }
+                            }
+                        }
 
-                    loadState.refresh is LoadState.NotLoading && repositories.itemCount == 0 -> {
-                        EmptyState(
-                            modifier = Modifier.padding(horizontal = LocalSpacing.current.large),
-                            message = stringResource(hopeapps.dedev.feature_repo.presentation.R.string.nothing_here),
-                            description = stringResource(hopeapps.dedev.feature_repo.presentation.R.string.nothing_here_description)
-                        )
-                    }
+                        is LoadState.Error -> {
+                            item {
+                                ErrorState(
+                                    modifier = Modifier.padding(horizontal = LocalSpacing.current.large),
+                                    message = stringResource(hopeapps.dedev.feature_repo.presentation.R.string.without_connection)
+                                )
+                            }
+                        }
 
-                    else -> {
-                        LazyColumn(
-                            modifier = Modifier
-                                .fillMaxSize()
-                                .padding(horizontal = LocalSpacing.current.medium),
-                            verticalArrangement = Arrangement.spacedBy(LocalSpacing.current.small)
-                        ) {
-                            items(
-                                count = repositories.itemCount,
-                                key = repositories.itemKey { it.id }
-                            ) { index ->
-                                repositories[index]?.let { repository ->
-                                    RepositoryItem(
-                                        name = repository.name,
-                                        description = repository.description,
-                                        language = repository.language,
-                                        onClick = { onRepositoryClick(repository) }
+                        is LoadState.NotLoading -> {
+                            if (repositories.itemCount == 0) {
+                                item {
+                                    EmptyState(
+                                        modifier = Modifier.padding(horizontal = LocalSpacing.current.large),
+                                        message = stringResource(hopeapps.dedev.feature_repo.presentation.R.string.nothing_here),
+                                        description = stringResource(hopeapps.dedev.feature_repo.presentation.R.string.nothing_here_description)
                                     )
+                                }
+                            } else {
+                                items(
+                                    count = repositories.itemCount,
+                                    key = repositories.itemKey { it.id }
+                                ) { index ->
+                                    repositories[index]?.let { repository ->
+                                        RepositoryItem(
+                                            name = repository.name,
+                                            description = repository.description,
+                                            language = repository.language
+                                        )
+                                    }
                                 }
                             }
                         }
