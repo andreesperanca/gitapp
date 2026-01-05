@@ -12,7 +12,7 @@ fun <T> CoroutineScope.launchSuspend(
 ) {
     onLoading(true)
     launch {
-        val result = withContext(Dispatchers.IO) { block() }
+        val result = block()
         onLoading(false)
         onResult(result)
     }

@@ -13,10 +13,13 @@ android {
         testInstrumentationRunner = "androidx.test.runner.AndroidJUnitRunner"
         consumerProguardFiles("consumer-rules.pro")
 
+        val networkKey: String = project.findProperty("network_key") as String?
+            ?: error("NETWORK_KEY não definida no local.properties")
+
         buildConfigField(
             "String",
             "NETWORK_KEY",
-            "\"${project.properties["network_key"]}\""
+            "\"$networkKey\""
         )
     }
 

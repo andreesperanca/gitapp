@@ -111,15 +111,15 @@ fun RepositoriesScreen(
                     loadState.refresh is LoadState.Error && repositories.itemCount == 0 -> {
                         ErrorState(
                             modifier = Modifier.padding(horizontal = LocalSpacing.current.large),
-                            message = "Sem conexão com a internet"
+                            message = stringResource(hopeapps.dedev.feature_repo.presentation.R.string.without_connection)
                         )
                     }
 
                     loadState.refresh is LoadState.NotLoading && repositories.itemCount == 0 -> {
                         EmptyState(
                             modifier = Modifier.padding(horizontal = LocalSpacing.current.large),
-                            message = "Nada aqui",
-                            description = "Nenhum repositório encontrado para esse usuário"
+                            message = stringResource(hopeapps.dedev.feature_repo.presentation.R.string.nothing_here),
+                            description = stringResource(hopeapps.dedev.feature_repo.presentation.R.string.nothing_here_description)
                         )
                     }
 

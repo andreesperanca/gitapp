@@ -1,4 +1,15 @@
 <?xml version="1.0" encoding="utf-8"?>
 <resources>
     <string name="search_title">Buscar</string>
+    <string name="without_connection">Sem conexão com a internet</string>
+    <string name="nothing_here">Nada aqui</string>
+    <string name="nothing_here_description">Nenhum repositório encontrado para esse usuário</string>
+    <string name="stars">Estrelas</string>
+    <string name="forks">Forks</string>
+    <string name="last_update">Atualização</string>
+    <string name="order_by">Ordenar por</string>
+    <string name="only_forks">Apenas forks</string>
+    <string name="error_message">Algo deu errado</string>
+    <string name="no_found_repositories">Nenhum repositório encontrado</string>
+    <string name="try_modifier_filters">Tente mudar os filtros ou a busca</string>
 </resources>

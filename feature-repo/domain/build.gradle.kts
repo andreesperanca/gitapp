@@ -15,5 +15,13 @@ kotlin {
     dependencies {
         //Pager
         implementation("androidx.paging:paging-common:3.3.1")
+        //Tests
+        testImplementation("io.mockk:mockk:1.13.10")
+        testImplementation("org.jetbrains.kotlinx:kotlinx-coroutines-test:1.7.3")
+        testImplementation("app.cash.turbine:turbine:1.0.0")
+        testImplementation("androidx.paging:paging-common:3.1.1")
     }
+}
+dependencies {
+    testImplementation(kotlin("test"))
 }

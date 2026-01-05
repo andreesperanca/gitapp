@@ -7,7 +7,6 @@ import hopeapps.dedev.common.launchSuspend
 import hopeapps.dedev.feature_users.domain.entity.User
 import hopeapps.dedev.feature_users.domain.usecase.FetchRecentUsersUseCase
 import hopeapps.dedev.feature_users.domain.usecase.SearchUserUseCase
-import kotlinx.coroutines.Dispatchers
 import kotlinx.coroutines.flow.MutableSharedFlow
 import kotlinx.coroutines.flow.MutableStateFlow
 import kotlinx.coroutines.flow.update
@@ -50,18 +49,20 @@ class UserViewModel(
                 }
             },
             onResult = { response ->
-                if (response is Result.Error) {
-                    sendEvent(UserEvent.ShowSnackBar(message = "Error message!"))
-                }
-                if (response is Result.Success) {
-                    fetchHistoricUsers()
+                when (response) {
+                    is Result.Error -> {
+                        sendEvent(UserEvent.ShowSnackBar(message = "Error message!"))
+                    }
+                    is Result.Success -> {
+                        fetchHistoricUsers()
+                    }
                 }
             }
         )
     }
 
     private fun handleUpdateExpandedSearch(isExpandedSearch: Boolean) {
-        viewModelScope.launch(Dispatchers.IO) {
+        viewModelScope.launch {
             state.update { state ->
                 state.copy(
                     isSearchExpanded = isExpandedSearch
@@ -71,7 +72,7 @@ class UserViewModel(
     }
 
     private fun handleUpdateFilterText(userFilterText: String) {
-        viewModelScope.launch(Dispatchers.IO) {
+        viewModelScope.launch {
             state.update { state ->
                 state.copy(
                     filterText = userFilterText
@@ -91,27 +92,18 @@ class UserViewModel(
     }
 
     private fun fetchHistoricUsers() {
-
         viewModelScope.launchSuspend(
-            block = {
-                fetchRecentUsersUseCase()
-            },
             onLoading = { isLoading ->
-                state.update { state ->
-                    state.copy(
-                        isLoading = isLoading
-                    )
-                }
+                state.update { state -> state.copy(isLoading = isLoading) }
             },
+            block = { fetchRecentUsersUseCase() },
             onResult = { response ->
-                if (response is Result.Error) {
-                    sendEvent(UserEvent.ShowSnackBar(message = "Error message!"))
-                }
-                if (response is Result.Success) {
-                    state.update { state ->
-                        state.copy(
-                            recentUsers = response.data
-                        )
+                when (response) {
+                    is Result.Error -> {
+                        sendEvent(UserEvent.ShowSnackBar(message = "Error message!"))
+                    }
+                    is Result.Success -> {
+                        state.update { it.copy(recentUsers = response.data) }
                     }
                 }
             }

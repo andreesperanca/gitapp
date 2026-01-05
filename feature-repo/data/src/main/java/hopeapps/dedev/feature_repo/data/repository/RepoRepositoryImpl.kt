@@ -7,7 +7,7 @@ import androidx.paging.PagingData
 import androidx.paging.map
 import hopeapps.dedev.core.database.AppDatabase
 import hopeapps.dedev.core.network.GitApi
-import hopeapps.dedev.feature_repo.data.datasource.RepoRemoteMediator
+import hopeapps.dedev.feature_repo.data.paging.RepoRemoteMediator
 import hopeapps.dedev.feature_repo.data.mapper.toDomain
 import hopeapps.dedev.feature_repo.data.paging.SearchPagingSource
 import hopeapps.dedev.feature_repo.domain.entity.RepoSearchFilter
@@ -58,5 +58,10 @@ class RepoRepositoryImpl(
                 )
             }
         ).flow
+            .map { pagingData ->
+                pagingData.map { repositoryEntity ->
+                    repositoryEntity.toDomain()
+                }
+            }
     }
 }

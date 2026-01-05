@@ -32,8 +32,3 @@ sealed interface ForkFilterType {
 }
 
 
-sealed interface RepoSort {
-    object Stars : RepoSort
-    object Forks : RepoSort
-    object Updated : RepoSort
-}

@@ -3,22 +3,21 @@ package hopeapps.dedev.feature_repo.data.paging
 import androidx.paging.PagingSource
 import androidx.paging.PagingState
 import hopeapps.dedev.core.network.GitApi
+import hopeapps.dedev.core.network.models.RepositoryDto
 import hopeapps.dedev.feature_repo.data.mapper.toApiValue
-import hopeapps.dedev.feature_repo.data.mapper.toDomain
 import hopeapps.dedev.feature_repo.domain.entity.RepoSearchFilter
-import hopeapps.dedev.feature_repo.domain.entity.Repository
 
 
 class SearchPagingSource(
     private val gitApi: GitApi,
     private val filter: RepoSearchFilter
-) : PagingSource<Int, Repository>() {
+) : PagingSource<Int, RepositoryDto>() {
 
-    override fun getRefreshKey(state: PagingState<Int, Repository>): Int? {
+    override fun getRefreshKey(state: PagingState<Int, RepositoryDto>): Int? {
         return state.anchorPosition
     }
 
-    override suspend fun load(params: LoadParams<Int>): LoadResult<Int, Repository> {
+    override suspend fun load(params: LoadParams<Int>): LoadResult<Int, RepositoryDto> {
         val currentPage = params.key ?: 1
         return try {
 
@@ -29,7 +28,7 @@ class SearchPagingSource(
                 sort = filter.sort.toApiValue(),
                 page = currentPage,
                 perPage = params.loadSize
-            ).toDomain()
+            )
 
             val endOfPaginationReached = response.items.isEmpty()
 

@@ -8,57 +8,71 @@ import androidx.paging.cachedIn
 import hopeapps.dedev.feature_repo.domain.entity.ForkFilterType
 import hopeapps.dedev.feature_repo.domain.entity.RepoSearchFilter
 import hopeapps.dedev.feature_repo.domain.entity.RepoSort
+import hopeapps.dedev.feature_repo.domain.entity.RepoSort.Forks
+import hopeapps.dedev.feature_repo.domain.entity.RepoSort.Stars
+import hopeapps.dedev.feature_repo.domain.entity.RepoSort.Updated
 import hopeapps.dedev.feature_repo.domain.entity.Repository
 import hopeapps.dedev.feature_repo.domain.usecase.SearchRepositoryPaginatedUseCase
+import kotlinx.coroutines.ExperimentalCoroutinesApi
 import kotlinx.coroutines.flow.MutableStateFlow
+import kotlinx.coroutines.flow.SharingStarted
+import kotlinx.coroutines.flow.StateFlow
+import kotlinx.coroutines.flow.flatMapLatest
+import kotlinx.coroutines.flow.stateIn
 import kotlinx.coroutines.flow.update
-import kotlinx.coroutines.launch
 
+
+@OptIn(ExperimentalCoroutinesApi::class)
 class RepoSearchViewModel(
     private val searchRepositoryPaginatedUseCase: SearchRepositoryPaginatedUseCase
 ) : ViewModel() {
 
-    var repoPagingFlow = MutableStateFlow<PagingData<Repository>>(PagingData.empty())
-        private set
-
     var repoSearchFilter = MutableStateFlow(RepoSearchFilter())
         private set
 
+    private val searchTrigger = MutableStateFlow(RepoSearchFilter())
+
+    val repoPagingFlow: StateFlow<PagingData<Repository>> =
+        searchTrigger.flatMapLatest { filter ->
+            searchRepositoryPaginatedUseCase(filter = filter, userFilterText = filter.user ?: "")
+        }.cachedIn(viewModelScope)
+            .stateIn(
+                scope = viewModelScope,
+                started = SharingStarted.WhileSubscribed(5_000),
+                initialValue = PagingData.empty()
+            )
+
     fun init(userLogin: String) {
         repoSearchFilter.update { repoSearchFilter ->
-            repoSearchFilter
-                .copy(user = userLogin)
+            repoSearchFilter.copy(user = userLogin)
         }
-        searchRepositories(repoSearchFilter.value)
+        searchTrigger.update { repoSearchFilter.value }
     }
 
     fun onAction(action: RepoSearchAction) {
         when (action) {
 
             is RepoSearchAction.OnSearchClick -> {
-                searchRepositories(
-                    filter = repoSearchFilter.value
-                )
+                searchTrigger.update { repoSearchFilter.value }
             }
 
             is RepoSearchAction.UpdateSortFilter -> {
                 when (action.orderByFilter) {
-                    "Estrelas" -> {
+                    Stars -> {
                         repoSearchFilter.update { repoSearchFilter ->
-                            repoSearchFilter
-                                .copy(sort = RepoSort.Stars)
+                            repoSearchFilter.copy(sort = RepoSort.Stars)
                         }
                     }
-                    "Forks" -> {
+
+                    Forks -> {
                         repoSearchFilter.update { repoSearchFilter ->
-                            repoSearchFilter
-                                .copy(sort = RepoSort.Forks)
+                            repoSearchFilter.copy(sort = RepoSort.Forks)
                         }
                     }
-                    "Última atualização" -> {
+
+                    Updated -> {
                         repoSearchFilter.update { repoSearchFilter ->
-                            repoSearchFilter
-                                .copy(sort = RepoSort.Updated)
+                            repoSearchFilter.copy(sort = RepoSort.Updated)
                         }
                     }
                 }
@@ -66,37 +80,21 @@ class RepoSearchViewModel(
 
             is RepoSearchAction.UpdatedForkFilterType -> {
                 repoSearchFilter.update { repoSearchFilter ->
-                    repoSearchFilter
-                        .copy(forkFilter = if (action.isOnlyFork ) ForkFilterType.OnlyForks else ForkFilterType.All)
+                    repoSearchFilter.copy(forkFilter = if (action.isOnlyFork) ForkFilterType.OnlyForks else ForkFilterType.All)
                 }
             }
 
             is RepoSearchAction.UpdatedLanguageFilter -> {
                 repoSearchFilter.update { repoSearchFilter ->
-                    repoSearchFilter
-                        .copy(
-                            language = action.languageFilter
-                        )
+                    repoSearchFilter.copy(
+                        language = action.languageFilter
+                    )
                 }
             }
 
             is RepoSearchAction.OnRepositorySelected -> {
 
             }
-        }
-    }
-
-
-
-    fun searchRepositories(filter: RepoSearchFilter) {
-        viewModelScope.launch {
-            searchRepositoryPaginatedUseCase(
-                filter = filter,
-                userFilterText = repoSearchFilter.value.user ?: "andreesperanca"
-            ).cachedIn(viewModelScope)
-                .collect { searchResponse ->
-                    repoPagingFlow.value = searchResponse
-                }
         }
     }
 }

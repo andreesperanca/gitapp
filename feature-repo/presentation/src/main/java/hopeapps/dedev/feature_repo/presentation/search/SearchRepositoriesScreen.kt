@@ -41,6 +41,7 @@ import hopeapps.dedev.core.presentation.designsystem.components.DefaultTitle
 import hopeapps.dedev.core.presentation.designsystem.components.EmptyState
 import hopeapps.dedev.core.presentation.designsystem.components.ErrorState
 import hopeapps.dedev.core.presentation.designsystem.components.RepositoryItem
+import hopeapps.dedev.feature_repo.domain.entity.RepoSort
 import hopeapps.dedev.feature_repo.domain.entity.Repository
 import org.koin.compose.viewmodel.koinViewModel
 
@@ -68,7 +69,7 @@ fun SearchRepositoriesScreen(
     var filterText by rememberSaveable { mutableStateOf("") }
     var isOnlyFork by rememberSaveable { mutableStateOf(false) }
     var isVisibleFilters by rememberSaveable { mutableStateOf(false) }
-    var selected by rememberSaveable { mutableStateOf("Estrelas") }
+    var selected by rememberSaveable { mutableStateOf(RepoSort.Updated) }
 
     Scaffold(
         modifier = Modifier.fillMaxSize(),
@@ -127,7 +128,7 @@ fun SearchRepositoriesScreen(
                     ) {
                         DefaultText(
                             modifier = Modifier.weight(1f),
-                            text = "Apenas forks"
+                            text = stringResource(hopeapps.dedev.feature_repo.presentation.R.string.only_forks)
                         )
 
                         Switch(
@@ -141,17 +142,20 @@ fun SearchRepositoriesScreen(
 
                     DefaultText(
                         modifier = Modifier.padding(horizontal = LocalSpacing.current.medium),
-                        text = "Ordenar por"
+                        text = stringResource(hopeapps.dedev.feature_repo.presentation.R.string.order_by)
                     )
 
                     ChipSelector(
                         modifier = Modifier.padding(horizontal = LocalSpacing.current.medium),
-                        options = listOf("Estrelas", "Forks", "Atualização"),
+                        options = RepoSort.entries,
                         onOptionSelected = { optionSelected ->
                             selected = optionSelected
                             onAction(RepoSearchAction.UpdateSortFilter(orderByFilter = optionSelected))
                         },
-                        selectedOption = selected
+                        selectedOption = selected,
+                        labelMapper = { label ->
+                            label.mapToLabel()
+                        }
                     )
                 }
             }
@@ -189,7 +193,7 @@ fun SearchRepositoriesScreen(
                 is LoadState.Error -> {
                     ErrorState(
                         modifier = Modifier.padding(horizontal = LocalSpacing.current.large),
-                        message = state.error.message ?: "Algo deu errado"
+                        message = state.error.message ?: stringResource(hopeapps.dedev.feature_repo.presentation.R.string.error_message)
                     )
                 }
 
@@ -197,8 +201,8 @@ fun SearchRepositoriesScreen(
                     if (repositories.itemCount == 0) {
                         EmptyState(
                             modifier = Modifier.padding(horizontal = LocalSpacing.current.large),
-                            message = "Nenhum repositório encontrado",
-                            description = "Tente mudar os filtros ou a busca"
+                            message = stringResource(hopeapps.dedev.feature_repo.presentation.R.string.no_found_repositories),
+                            description = stringResource(hopeapps.dedev.feature_repo.presentation.R.string.try_modifier_filters)
                         )
                     } else {
                         LazyColumn(
@@ -209,7 +213,7 @@ fun SearchRepositoriesScreen(
                         ) {
                             items(
                                 count = repositories.itemCount,
-                                key = repositories.itemKey { it.id }
+                                key = repositories.itemKey { item -> item.id }
                             ) { index ->
                                 repositories[index]?.let { repository ->
                                     RepositoryItem(

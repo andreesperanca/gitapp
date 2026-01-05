@@ -12,11 +12,12 @@ import hopeapps.dedev.core.presentation.designsystem.LocalSpacing
 
 @OptIn(ExperimentalLayoutApi::class)
 @Composable
-fun ChipSelector(
-    options: List<String>,
-    selectedOption: String,
-    onOptionSelected: (String) -> Unit,
-    modifier: Modifier = Modifier
+fun <T> ChipSelector(
+    modifier: Modifier = Modifier,
+    options: List<T>,
+    selectedOption: T?,
+    onOptionSelected: (T) -> Unit,
+    labelMapper: @Composable (T) -> String
 ) {
     FlowRow(
         modifier = modifier,
@@ -25,9 +26,11 @@ fun ChipSelector(
     ) {
         options.forEach { option ->
             FilterChip(
-                selected = selectedOption == option,
+                selected = option == selectedOption,
                 onClick = { onOptionSelected(option) },
-                label = { Text(text = option) }
+                label = {
+                    Text(labelMapper(option))
+                }
             )
         }
     }
