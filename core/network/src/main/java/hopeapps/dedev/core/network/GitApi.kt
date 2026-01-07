@@ -1,5 +1,8 @@
 package hopeapps.dedev.core.network
 
+import hopeapps.dedev.core.network.models.IssueDto
+import hopeapps.dedev.core.network.models.PullRequestDto
+import hopeapps.dedev.core.network.models.RepoReadmeDto
 import hopeapps.dedev.core.network.models.RepositoryDto
 import hopeapps.dedev.core.network.models.SearchResponseDto
 import hopeapps.dedev.core.network.models.UserDto
@@ -30,12 +33,32 @@ interface GitApi {
         @Query("per_page") perPage: Int
     ): SearchResponseDto
 
-
+    @GET("/repos/{owner}/{repo}/readme")
+    suspend fun fetchReadmeRepository(
+        @Path("owner") owner: String,
+        @Path("repo") repo: String
+    ): RepoReadmeDto
 
     @GET("repos/{owner}/{repo}/languages")
-    suspend fun getLanguages(
+    suspend fun getRepositoryLanguages(
         @Path("owner") owner: String,
         @Path("repo") repo: String
     ): Map<String, Int>
+
+    @GET("repos/{owner}/{repo}/pulls")
+    suspend fun fetchRepoPullRequests(
+        @Path("owner") owner: String,
+        @Path("repo") repo: String,
+        @Query("page") page: Int,
+        @Query("per_page") perPage: Int
+    ): List<PullRequestDto>
+
+    @GET("repos/{owner}/{repo}/issues")
+    suspend fun fetchRepoIssues(
+        @Path("owner") owner: String,
+        @Path("repo") repo: String,
+        @Query("page") page: Int,
+        @Query("per_page") perPage: Int
+    ): List<IssueDto>
 
 }

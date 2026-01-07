@@ -6,6 +6,7 @@ import androidx.navigation.NavType
 import androidx.navigation.compose.NavHost
 import androidx.navigation.compose.composable
 import androidx.navigation.navArgument
+import hopeapps.dedev.feature_repo.presentation.details.RepoDetailsScreenRoot
 import hopeapps.dedev.feature_repo.presentation.list.RepositoriesScreenRoot
 import hopeapps.dedev.feature_repo.presentation.search.SearchRepositoriesScreenRoot
 import hopeapps.dedev.feature_users.presentation.UserScreenRoot
@@ -40,8 +41,8 @@ fun SetupNavGraph(navController: NavHostController) {
                 navigateToSearchRepositories = { userLogin ->
                     navController.navigate(Screen.SearchRepositoriesScreen.createRoute(userLogin = userLogin))
                 },
-                navigateToRepositoryDetails = {
-
+                navigateToRepositoryDetails = { repoId ->
+                    navController.navigate(Screen.RepoDetailsScreen.createRoute(repoId))
                 },
                 backButtonListener = { navController.popBackStack() }
             )
@@ -60,8 +61,25 @@ fun SetupNavGraph(navController: NavHostController) {
                 userLogin = login,
                 onBackListener = {
                     navController.popBackStack()
+                },
+                clickListenerRepository = { repoId ->
+                    navController.navigate(Screen.RepoDetailsScreen.createRoute(repoId))
                 }
             )
+        }
+
+        composable(
+            route = Screen.RepoDetailsScreen.route,
+            arguments = listOf(
+                navArgument("repoId") {
+                    type = NavType.LongType
+                }
+            )
+        ) { backStackEntry ->
+            val repoId = backStackEntry.arguments?.getLong("repoId")
+                ?: error("repoId is required")
+
+            RepoDetailsScreenRoot(repoId = repoId)
         }
     }
 }

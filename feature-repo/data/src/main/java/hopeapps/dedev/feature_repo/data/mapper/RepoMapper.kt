@@ -1,7 +1,10 @@
 package hopeapps.dedev.feature_repo.data.mapper
 
 import hopeapps.dedev.core.database.model.RepositoryEntity
+import hopeapps.dedev.core.network.models.LanguagesDto
+import hopeapps.dedev.core.network.models.RepoReadmeDto
 import hopeapps.dedev.core.network.models.RepositoryDto
+import hopeapps.dedev.feature_repo.domain.entity.RepoReadme
 import hopeapps.dedev.feature_repo.domain.entity.RepoSort
 import hopeapps.dedev.feature_repo.domain.entity.Repository
 
@@ -15,6 +18,9 @@ fun RepositoryDto.toDomain(): Repository {
         language = language ?: "",
         lastUpdate = updatedAt,
         isFork = isFork,
+        repoOwner = owner.login,
+        watchers = watchersCount,
+        issues = openIssuesCount
     )
 }
 
@@ -29,7 +35,9 @@ fun RepositoryDto.toRepositoryEntity(): RepositoryEntity {
         language = language ?: "",
         lastUpdate = updatedAt,
         isFork = isFork,
-        userLogin = owner.login
+        repoOwner = owner.login,
+        watchers = watchers,
+        issues = openIssuesCount
     )
 }
 
@@ -48,9 +56,18 @@ fun RepositoryEntity.toDomain(): Repository {
         language = language,
         lastUpdate = lastUpdate,
         isFork = isFork,
+        repoOwner = repoOwner,
+        watchers = watchers,
+        issues = issues
     )
 }
 
+
+fun RepoReadmeDto.toDomain(): RepoReadme {
+    return RepoReadme(
+        content = content
+    )
+}
 
 fun RepoSort.toApiValue(): String =
     when (this) {
@@ -58,3 +75,9 @@ fun RepoSort.toApiValue(): String =
         RepoSort.Forks -> "forks"
         RepoSort.Updated -> "updated"
     }
+
+fun LanguagesDto.toDomain() : List<String> {
+    return map { languages ->
+        languages.key
+    }
+}

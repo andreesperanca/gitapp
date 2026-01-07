@@ -64,4 +64,7 @@ dependencies {
     testImplementation(libs.turbine)
     testImplementation(libs.androidx.paging.common)
     testImplementation(libs.junit)
+    //Markdown 
+    implementation("io.noties.markwon:core:4.6.2")
+    implementation("io.noties.markwon:image-glide:4.6.2")
 }

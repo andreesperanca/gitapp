@@ -46,7 +46,7 @@ fun RepositoriesScreenRoot(
     userLogin: String,
     viewModel: RepositoriesViewModel = koinViewModel(),
     navigateToSearchRepositories: (userLogin: String) -> Unit,
-    navigateToRepositoryDetails: (repository: Repository) -> Unit,
+    navigateToRepositoryDetails: (repoId: Long) -> Unit,
     backButtonListener: () -> Unit
 ) {
     LaunchedEffect(true) {
@@ -59,8 +59,8 @@ fun RepositoriesScreenRoot(
         onSearchClick = {
             navigateToSearchRepositories(userLogin)
         },
-        onRepositoryClick = { repository ->
-            navigateToRepositoryDetails(repository)
+        onRepositoryClick = { repoId ->
+            navigateToRepositoryDetails(repoId)
         },
         backButtonListener = {
             backButtonListener()
@@ -73,12 +73,10 @@ fun RepositoriesScreenRoot(
 fun RepositoriesScreen(
     repositories: LazyPagingItems<Repository>,
     onSearchClick: () -> Unit,
-    onRepositoryClick: (repository: Repository) -> Unit,
+    onRepositoryClick: (repoId: Long) -> Unit,
     backButtonListener: () -> Unit
 ) {
 
-    val pagerState = repositories.loadState
-    val listState = rememberLazyListState()
     Scaffold(
         topBar = {
             DefaultTopAppBar(
@@ -113,65 +111,66 @@ fun RepositoriesScreen(
             modifier = Modifier
                 .padding(paddingValues)
                 .fillMaxSize(),
-            isLoading = pagerState.refresh is LoadState.Loading,
+            isLoading = repositories.loadState.refresh is LoadState.Loading,
             content = {
-                LazyColumn(
-                    modifier = Modifier
-                        .fillMaxSize()
-                        .navigationBarsPadding(),
-                    contentPadding = PaddingValues(
-                        horizontal = LocalSpacing.current.medium,
-                        vertical = 8.dp
-                    ),
-                    verticalArrangement = Arrangement.spacedBy(LocalSpacing.current.small),
-                    state = listState
-                ) {
+                Box ( modifier = Modifier.fillMaxSize() ) {
 
-                    when (repositories.loadState.refresh) {
-                        is LoadState.Loading -> {
-                            item {
-                                Box(
-                                    modifier = Modifier.fillParentMaxSize(),
-                                    contentAlignment = Alignment.Center
-                                ) {
-                                    CircularProgressIndicator()
-                                }
-                            }
-                        }
+                    val listState = rememberLazyListState()
+                    val hasItems = repositories.itemCount > 0
 
-                        is LoadState.Error -> {
-                            item {
-                                ErrorState(
-                                    modifier = Modifier.padding(horizontal = LocalSpacing.current.large),
-                                    message = stringResource(hopeapps.dedev.feature_repo.presentation.R.string.without_connection)
+                    LazyColumn(
+                        state = listState,
+                        modifier = Modifier
+                            .fillMaxSize(),
+                        contentPadding = PaddingValues(
+                            horizontal = LocalSpacing.current.medium,
+                            vertical = LocalSpacing.current.small
+                        ),
+                        verticalArrangement = Arrangement.spacedBy(LocalSpacing.current.small)
+                    ) {
+                        items(count = repositories.itemCount) { index ->
+                            repositories[index]?.let { repository ->
+                                RepositoryItem(
+                                    name = repository.name,
+                                    description = repository.description,
+                                    language = repository.language,
+                                    onClick = {
+                                        onRepositoryClick(repository.id)
+                                    }
                                 )
                             }
                         }
+                    }
 
-                        is LoadState.NotLoading -> {
-                            if (repositories.itemCount == 0) {
-                                item {
-                                    EmptyState(
-                                        modifier = Modifier.padding(horizontal = LocalSpacing.current.large),
-                                        message = stringResource(hopeapps.dedev.feature_repo.presentation.R.string.nothing_here),
-                                        description = stringResource(hopeapps.dedev.feature_repo.presentation.R.string.nothing_here_description)
-                                    )
-                                }
-                            } else {
-                                items(
-                                    count = repositories.itemCount,
-                                    key = repositories.itemKey { it.id }
-                                ) { index ->
-                                    repositories[index]?.let { repository ->
-                                        RepositoryItem(
-                                            name = repository.name,
-                                            description = repository.description,
-                                            language = repository.language
-                                        )
-                                    }
-                                }
-                            }
-                        }
+                    if (repositories.loadState.refresh is LoadState.Loading && !hasItems) {
+                        CircularProgressIndicator(
+                            modifier = Modifier.align(Alignment.Center)
+                        )
+                    }
+
+                    if (repositories.loadState.refresh is LoadState.Error && !hasItems) {
+                        ErrorState(
+                            modifier = Modifier
+                                .align(Alignment.Center)
+                                .padding(horizontal = LocalSpacing.current.large),
+                            message = stringResource(
+                                hopeapps.dedev.feature_repo.presentation.R.string.without_connection
+                            )
+                        )
+                    }
+
+                    if (repositories.loadState.refresh is LoadState.NotLoading && !hasItems) {
+                        EmptyState(
+                            modifier = Modifier
+                                .align(Alignment.Center)
+                                .padding(horizontal = LocalSpacing.current.large),
+                            message = stringResource(
+                                hopeapps.dedev.feature_repo.presentation.R.string.nothing_here
+                            ),
+                            description = stringResource(
+                                hopeapps.dedev.feature_repo.presentation.R.string.nothing_here_description
+                            )
+                        )
                     }
                 }
             }
@@ -210,6 +209,9 @@ private val fakeData = listOf(
         forks = 1,
         language = "",
         lastUpdate = "",
-        isFork = false
+        isFork = false,
+        watchers = 1,
+        issues = 1,
+        repoOwner = ""
     )
 )

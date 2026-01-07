@@ -51,6 +51,7 @@ dependencies {
     implementation(project(":feature-repo:domain"))
     implementation(project(":core:database"))
     implementation(project(":core:network"))
+    implementation(project(":core:common"))
 
     //Tests
     testImplementation(libs.mockk)

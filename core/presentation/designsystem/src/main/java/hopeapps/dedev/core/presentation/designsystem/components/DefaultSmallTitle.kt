@@ -20,7 +20,7 @@ fun DefaultSmallTitle(
         modifier = modifier.testTag("title_component"),
         text = title,
         color = color,
-        fontSize = 16.sp,
+        fontSize = 14.sp,
         overflow = TextOverflow.Ellipsis
     )
 }

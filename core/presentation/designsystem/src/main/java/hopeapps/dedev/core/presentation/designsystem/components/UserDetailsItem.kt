@@ -186,7 +186,7 @@ fun UserDetailsItem(
 @Composable
 fun InfoItem(modifier: Modifier = Modifier, title: String, value: String) {
     Column(
-        modifier = modifier.padding(PaddingValues(all = LocalSpacing.current.small)),
+        modifier = modifier,
         horizontalAlignment = Alignment.CenterHorizontally
     ) {
         DefaultText(text = title)

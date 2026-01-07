@@ -11,9 +11,13 @@ interface RepoDao {
     @Upsert
     suspend fun upsertAll(repos: List<RepositoryEntity>)
 
-    @Query("SELECT * FROM repositories WHERE userLogin = :userFilterText")
+    @Query("SELECT * FROM repositories WHERE repoOwner = :userFilterText")
     fun getAllRepositories(userFilterText: String): PagingSource<Int, RepositoryEntity>
 
-    @Query("DELETE FROM repositories WHERE userLogin = :userLogin")
+
+    @Query("SELECT * FROM repositories WHERE id = :repoId")
+    fun getRepositoryById(repoId: Long): RepositoryEntity
+
+    @Query("DELETE FROM repositories WHERE repoOwner = :userLogin")
     suspend fun clearAll(userLogin: String)
 }

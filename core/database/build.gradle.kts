@@ -54,4 +54,6 @@ dependencies {
     // Paging
     implementation("androidx.paging:paging-runtime-ktx:3.1.1")
     implementation("androidx.room:room-paging:2.6.1")
+    //Gson
+    implementation(libs.gson)
 }

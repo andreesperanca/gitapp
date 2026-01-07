@@ -57,7 +57,9 @@ import org.koin.compose.viewmodel.koinViewModel
 
 @Composable
 fun SearchRepositoriesScreenRoot(
-    userLogin: String, viewModel: RepoSearchViewModel = koinViewModel(), onBackListener: () -> Unit
+    userLogin: String, viewModel: RepoSearchViewModel = koinViewModel(),
+    onBackListener: () -> Unit,
+    clickListenerRepository: (repoId: Long) -> Unit
 ) {
     val repositories = viewModel.repoPagingFlow.collectAsLazyPagingItems()
 
@@ -66,7 +68,7 @@ fun SearchRepositoriesScreenRoot(
     }
 
     SearchRepositoriesScreen(
-        viewModel, repositories, onBackListener
+        viewModel, repositories, onBackListener, clickListenerRepository
     )
 }
 
@@ -75,7 +77,8 @@ fun SearchRepositoriesScreenRoot(
 fun SearchRepositoriesScreen(
     viewModel: RepoSearchViewModel,
     repositories: LazyPagingItems<Repository>,
-    onBackListener: () -> Unit
+    onBackListener: () -> Unit,
+    clickListenerRepository: (repoId: Long) -> Unit
 ) {
 
     var filterText by rememberSaveable { mutableStateOf("") }
@@ -243,7 +246,10 @@ fun SearchRepositoriesScreen(
                                     RepositoryItem(
                                         name = repository.name,
                                         description = repository.description,
-                                        language = repository.language
+                                        language = repository.language,
+                                        onClick = {
+                                            clickListenerRepository(repository.id)
+                                        }
                                     )
                                 }
                             }

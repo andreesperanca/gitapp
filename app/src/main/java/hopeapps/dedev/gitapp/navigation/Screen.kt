@@ -13,4 +13,10 @@ sealed class Screen(val route: String) {
         fun createRoute(userLogin: String) =
             "search_repositories_screen/$userLogin"
     }
+
+    object RepoDetailsScreen : Screen("repo_details_screen/{repoId}") {
+        fun createRoute(repoId: Long) =
+            "repo_details_screen/$repoId"
+    }
+
 }

@@ -12,4 +12,11 @@
     <string name="error_message">Algo deu errado</string>
     <string name="no_found_repositories">Nenhum repositório encontrado</string>
     <string name="try_modifier_filters">Tente mudar os filtros ou a busca</string>
+    <string name="overview">Overview</string>
+    <string name="pull_requests">Pull Requests</string>
+    <string name="issues">Issues</string>
+    <string name="statistics">Estatísticas</string>
+    <string name="watchers">Watchers</string>
+    <string name="read_me">Leia-me</string>
+    <string name="languages">Linguagens</string>
 </resources>

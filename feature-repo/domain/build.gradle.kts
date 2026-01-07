@@ -12,6 +12,7 @@ kotlin {
     }
 
 
+    //TODO: REMOVER AQUI
     dependencies {
         //Pager
         implementation("androidx.paging:paging-common:3.3.1")
@@ -23,7 +24,8 @@ kotlin {
     }
 }
 dependencies {
-    testImplementation(kotlin("test"))
+    //Modules
+    implementation(project(":core:common"))
     //Tests
     testImplementation(libs.mockk)
     testImplementation(libs.kotlinx.coroutines.test)

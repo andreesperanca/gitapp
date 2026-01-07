@@ -9,4 +9,7 @@ data class Repository(
     val language: String,
     val lastUpdate: String,
     val isFork: Boolean,
+    val repoOwner: String,
+    val watchers: Int,
+    val issues: Int
 )

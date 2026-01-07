@@ -10,21 +10,19 @@ import androidx.compose.foundation.layout.padding
 import androidx.compose.material3.Card
 import androidx.compose.material3.CardDefaults
 import androidx.compose.material3.MaterialTheme
-import androidx.compose.material3.Text
 import androidx.compose.runtime.Composable
 import androidx.compose.ui.Alignment
 import androidx.compose.ui.Modifier
-import androidx.compose.ui.text.style.TextOverflow
 import androidx.compose.ui.unit.dp
 import hopeapps.dedev.core.presentation.designsystem.LocalSpacing
 
 @Composable
 fun RepositoryItem(
+    modifier: Modifier = Modifier,
     onClick: () -> Unit = {},
     name: String,
     description: String?,
     language: String?,
-    modifier: Modifier = Modifier
 ) {
     Card(
         modifier = modifier.fillMaxWidth(),
@@ -32,7 +30,8 @@ fun RepositoryItem(
         colors = CardDefaults.cardColors(
             containerColor = MaterialTheme.colorScheme.surface
         ),
-        elevation = CardDefaults.cardElevation(defaultElevation = 1.dp)
+        elevation = CardDefaults.cardElevation(defaultElevation = 1.dp),
+        onClick = { onClick() }
     ) {
         Column(
             modifier = Modifier.padding(LocalSpacing.current.small)
