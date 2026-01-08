@@ -79,7 +79,10 @@ fun SetupNavGraph(navController: NavHostController) {
             val repoId = backStackEntry.arguments?.getLong("repoId")
                 ?: error("repoId is required")
 
-            RepoDetailsScreenRoot(repoId = repoId)
+            RepoDetailsScreenRoot(
+                onBackListener = { navController.popBackStack() },
+                repoId = repoId
+            )
         }
     }
 }

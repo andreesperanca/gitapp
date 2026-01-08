@@ -7,7 +7,8 @@ data class RepoDetailState (
     val issues: Int = 0,
     val name: String = "",
     val description: String = "",
-    val languages: List<String> = emptyList(),
+    val languages: String = "",
     val readme: String = "",
-    val isLoading: Boolean = false
+    val isLoading: Boolean = false,
+    val urlRepo: String = ""
 )

@@ -38,9 +38,11 @@ fun OverviewContent(
     watchers: Int,
     issues: Int,
     readMe: String,
-    languages: List<String>,
+    languages: String,
     repoName: String,
-    repoDescription: String
+    repoDescription: String,
+    openRepoInWeb: () -> Unit,
+    shareRepo: () -> Unit
 ) {
     Column(
         modifier = modifier
@@ -83,7 +85,7 @@ fun OverviewContent(
                         tint = MaterialTheme.colorScheme.onSurfaceVariant,
                     )
                 },
-                onClick = {    }
+                onClick = {  shareRepo()  }
             )
 
             IconButton (
@@ -94,7 +96,7 @@ fun OverviewContent(
                         tint = MaterialTheme.colorScheme.onSurfaceVariant,
                     )
                 },
-                onClick = {    }
+                onClick = {  openRepoInWeb()  }
             )
         }
 
@@ -131,24 +133,32 @@ fun OverviewContent(
             )
         }
 
-        DefaultSmallTitle(
-            modifier = Modifier
-                .padding(top = 16.dp),
-            title = stringResource(hopeapps.dedev.feature_repo.presentation.R.string.languages)
-        )
+        if (languages.isNotEmpty()) {
+            DefaultSmallTitle(
+                modifier = Modifier
+                    .padding(top = 16.dp),
+                title = stringResource(hopeapps.dedev.feature_repo.presentation.R.string.languages)
+            )
 
-        Text(languages.joinToString(", "))
+            DefaultText(
+                modifier = Modifier,
+                text = languages,
+                maxLines = 4
+            )
+        }
 
-        DefaultSmallTitle(
-            modifier = Modifier
-                .padding(top = 16.dp),
-            title = stringResource(hopeapps.dedev.feature_repo.presentation.R.string.read_me)
-        )
+        if (readMe.isNotEmpty()) {
+            DefaultSmallTitle(
+                modifier = Modifier
+                    .padding(top = 16.dp),
+                title = stringResource(hopeapps.dedev.feature_repo.presentation.R.string.read_me)
+            )
 
-        MarkdownComponent (
-            modifier = Modifier.padding(top = 16.dp),
-            markdown = readMe
-        )
+            MarkdownComponent (
+                modifier = Modifier.padding(top = 16.dp),
+                markdown = readMe
+            )
+        }
     }
 }
 
@@ -163,9 +173,11 @@ private fun OverviewPreview() {
             forks = 1,
             issues = 1,
             watchers = 1,
-            languages = listOf("Kotlin", "Java", "C++"),
+            languages = "Kotlin, Java ",
             repoName = "Repo Name",
-            repoDescription = "Repo Description"
+            repoDescription = "Repo Description",
+            openRepoInWeb = {},
+            shareRepo = {}
         )
     }
 }

@@ -26,12 +26,14 @@ class RepoUseCase(
 
     suspend fun fetchRepoLanguages(
         repoName: String,
-        repoOwner: String
+        repoOwner: String,
+        repoId: Long
     ): Result<List<String>> {
         return withContext(Dispatchers.IO) {
             repoRepository.fetchRepoLanguages(
                 repoName = repoName,
-                repoOwner = repoOwner
+                repoOwner = repoOwner,
+                repoId = repoId
             )
         }
     }

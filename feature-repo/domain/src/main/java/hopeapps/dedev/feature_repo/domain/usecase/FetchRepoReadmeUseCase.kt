@@ -12,12 +12,14 @@ class FetchRepoReadmeUseCase(
 ) {
     suspend operator fun invoke(
         repoName: String,
-        repoOwner: String
+        repoOwner: String,
+        repoId: Long
     ): Result<RepoReadme> {
         return withContext(Dispatchers.IO) {
             repoRepository.fetchRepositoryReadme(
                 repoName = repoName,
-                repoOwner = repoOwner
+                repoOwner = repoOwner,
+                repoId = repoId
             )
         }
     }

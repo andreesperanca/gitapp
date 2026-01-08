@@ -11,6 +11,7 @@ import hopeapps.dedev.core.network.GitApi
 import hopeapps.dedev.feature_repo.data.datasource.RepoLocalDataSource
 import hopeapps.dedev.feature_repo.data.datasource.RepoRemoteDataSource
 import hopeapps.dedev.feature_repo.data.mapper.toDomain
+import hopeapps.dedev.feature_repo.data.mapper.toEntity
 import hopeapps.dedev.feature_repo.data.paging.IssuesRemoteMediator
 import hopeapps.dedev.feature_repo.data.paging.PullRequestRemoteMediator
 import hopeapps.dedev.feature_repo.data.paging.RepoRemoteMediator
@@ -93,7 +94,8 @@ class RepoRepositoryImpl(
 
     override suspend fun fetchRepositoryReadme(
         repoOwner: String,
-        repoName: String
+        repoName: String,
+        repoId: Long
     ): Result<RepoReadme> {
 
         val response = repoRemoteDataSource.fetchRepositoryReadme(
@@ -103,10 +105,18 @@ class RepoRepositoryImpl(
 
         return when (response) {
             is Result.Error -> {
+
+                val content = repoLocalDataSource.fetchRepoContent(repoId = repoId)
+
+                if (content is Result.Success && content.data != null) {
+                    return Result.Success(data = content.data!!.toDomain())
+                }
+
                 Result.Error(error = response.error)
             }
 
             is Result.Success -> {
+                repoLocalDataSource.saveRepoContent(response.data.toEntity(repoId = repoId))
                 Result.Success(data = response.data.toDomain())
             }
         }
@@ -114,7 +124,8 @@ class RepoRepositoryImpl(
 
     override suspend fun fetchRepoLanguages(
         repoOwner: String,
-        repoName: String
+        repoName: String,
+        repoId: Long
     ): Result<List<String>> {
 
         val response = repoRemoteDataSource.fetchRepositoryLanguages(
@@ -124,10 +135,18 @@ class RepoRepositoryImpl(
 
         return when (response) {
             is Result.Error -> {
+
+                val content = repoLocalDataSource.fetchRepoLanguages(repoId = repoId)
+
+                if (content is Result.Success && content.data != null) {
+                    return Result.Success(data = content.data!!.toDomain())
+                }
+
                 Result.Error(error = response.error)
             }
 
             is Result.Success -> {
+                repoLocalDataSource.saveRepoLanguages(response.data.toEntity(repoId = repoId))
                 Result.Success(data = response.data.toDomain())
             }
         }

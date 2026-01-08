@@ -29,7 +29,7 @@ val featureRepo = module {
     single<RepoUseCase> { RepoUseCase(get() )}
 
     single<RepoRemoteDataSource> { RepoRemoteDataSourceImpl(get()) }
-    single<RepoLocalDataSource> { RepoLocalDataSourceImpl(get()) }
+    single<RepoLocalDataSource> { RepoLocalDataSourceImpl(get(), get(), get()) }
 
 
     viewModelOf(::RepositoriesViewModel)

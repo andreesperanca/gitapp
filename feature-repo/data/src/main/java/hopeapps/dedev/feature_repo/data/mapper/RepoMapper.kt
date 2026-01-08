@@ -1,5 +1,7 @@
 package hopeapps.dedev.feature_repo.data.mapper
 
+import hopeapps.dedev.core.database.model.RepoReadmeEntity
+import hopeapps.dedev.core.database.model.RepoLanguageEntity
 import hopeapps.dedev.core.database.model.RepositoryEntity
 import hopeapps.dedev.core.network.models.LanguagesDto
 import hopeapps.dedev.core.network.models.RepoReadmeDto
@@ -69,6 +71,15 @@ fun RepoReadmeDto.toDomain(): RepoReadme {
     )
 }
 
+
+fun RepoReadmeDto.toEntity(repoId: Long): RepoReadmeEntity {
+    return RepoReadmeEntity(
+        repoId = repoId,
+        content = content
+    )
+}
+
+
 fun RepoSort.toApiValue(): String =
     when (this) {
         RepoSort.Stars -> "stars"
@@ -80,4 +91,24 @@ fun LanguagesDto.toDomain() : List<String> {
     return map { languages ->
         languages.key
     }
+}
+
+fun LanguagesDto.toEntity(repoId: Long) : RepoLanguageEntity {
+    return RepoLanguageEntity(
+        repoId = repoId,
+        languages = map { languages ->
+            languages.key
+        }
+    )
+}
+
+
+fun RepoReadmeEntity.toDomain(): RepoReadme {
+    return RepoReadme(
+        content = content
+    )
+}
+
+fun RepoLanguageEntity.toDomain(): List<String> {
+    return languages
 }

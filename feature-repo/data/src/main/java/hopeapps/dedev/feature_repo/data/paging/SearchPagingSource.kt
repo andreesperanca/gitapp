@@ -21,14 +21,19 @@ class SearchPagingSource(
         val currentPage = params.key ?: 1
         return try {
 
-            //Let the comment, is necessary toDomain here?
-            //OR in repository layer?
             val response = gitApi.searchRepositories(
                 query = filter.buildQuery(),
                 sort = filter.sort.toApiValue(),
                 page = currentPage,
                 perPage = params.loadSize
             )
+
+            val languageResponse = response.items.forEach {
+                gitApi.getRepositoryLanguages(
+                    owner = it.owner.login,
+                    repo = it.name
+                )
+            }
 
             val endOfPaginationReached = response.items.isEmpty()
 

@@ -11,11 +11,13 @@ val databaseModule = module {
         Room.databaseBuilder(
                 androidContext(),
                 AppDatabase::class.java,
-                "contacts_database"
+                "database"
             ).fallbackToDestructiveMigration(false)
             .build()
     }
 
     single { get<AppDatabase>().userDao() }
     single { get<AppDatabase>().repoDao() }
+    single { get<AppDatabase>().repoLanguageDao() }
+    single { get<AppDatabase>().repoContentDao() }
 }

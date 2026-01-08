@@ -12,11 +12,13 @@ import hopeapps.dedev.common.Result
 import hopeapps.dedev.feature_repo.domain.entity.PullRequest
 import hopeapps.dedev.feature_repo.domain.usecase.FetchRepoReadmeUseCase
 import hopeapps.dedev.feature_repo.domain.usecase.RepoUseCase
+import hopeapps.dedev.feature_repo.presentation.details.DetailEvent.*
 import hopeapps.dedev.feature_repo.presentation.details.tab.RepoParams
 import hopeapps.dedev.feature_repo.presentation.utils.IssueUiModel
 import hopeapps.dedev.feature_repo.presentation.utils.toUiModel
 import kotlinx.coroutines.ExperimentalCoroutinesApi
 import kotlinx.coroutines.delay
+import kotlinx.coroutines.flow.MutableSharedFlow
 import kotlinx.coroutines.flow.MutableStateFlow
 import kotlinx.coroutines.flow.SharingStarted
 import kotlinx.coroutines.flow.StateFlow
@@ -35,6 +37,9 @@ class RepoDetailViewModel (
 ) : ViewModel() {
 
     var repoDetailState = MutableStateFlow(RepoDetailState())
+        private set
+
+    var event = MutableSharedFlow<DetailEvent>()
         private set
 
     private val repoParams = MutableStateFlow<RepoParams?>(null)
@@ -57,7 +62,6 @@ class RepoDetailViewModel (
             )
 
 
-    @RequiresApi(Build.VERSION_CODES.O)
     val issuesPagingFlow: StateFlow<PagingData<IssueUiModel>> =
         repoParams
             .filterNotNull()
@@ -79,6 +83,21 @@ class RepoDetailViewModel (
                 initialValue = PagingData.empty()
             )
 
+    fun onAction(action: DetailAction) {
+        when (action) {
+            is DetailAction.OpenRepoInWeb -> {
+                sendEvent(OpenRepoInWeb(repoDetailState.value.urlRepo))
+            }
+
+            is DetailAction.ShareRepo -> {
+                sendEvent(ShareRepo(repoDetailState.value.urlRepo))
+            }
+
+            DetailAction.BackListener -> {
+                sendEvent(BackListener)
+            }
+        }
+    }
 
     fun start(
         repoId: Long
@@ -104,16 +123,19 @@ class RepoDetailViewModel (
                             watchers = response.data.watchers,
                             issues = response.data.issues,
                             name = response.data.name,
-                            description = response.data.description
+                            description = response.data.description,
+                            urlRepo = buildUrl(repoName = response.data.name, repoOwner = response.data.repoOwner)
                         )
                     }
                     fetchRepoReadMe(
                         repoName = response.data.name,
-                        repoOwner = response.data.repoOwner
+                        repoOwner = response.data.repoOwner,
+                        repoId = repoId
                     )
                     fetchLanguageRepo(
                         repoName = response.data.name,
-                        repoOwner = response.data.repoOwner
+                        repoOwner = response.data.repoOwner,
+                        repoId = repoId
                     )
                 }
                 is Result.Error -> {
@@ -126,6 +148,14 @@ class RepoDetailViewModel (
             }
         }
     }
+
+
+    private fun sendEvent(newEvent: DetailEvent) {
+        viewModelScope.launch {
+            event.emit(newEvent)
+        }
+    }
+
 
     private fun decodeReadme(base64Content: String): String {
         val cleanBase64 = base64Content
@@ -141,11 +171,13 @@ class RepoDetailViewModel (
 
     private suspend fun fetchRepoReadMe(
         repoName: String,
-        repoOwner: String
+        repoOwner: String,
+        repoId: Long
     ) {
         val response = fetchRepoReadmeUseCase(
             repoName = repoName,
-            repoOwner = repoOwner
+            repoOwner = repoOwner,
+            repoId = repoId
         )
 
         when (response) {
@@ -164,11 +196,13 @@ class RepoDetailViewModel (
 
     private suspend fun fetchLanguageRepo(
         repoName: String,
-        repoOwner: String
+        repoOwner: String,
+        repoId: Long
     ) {
         val response = repoUseCase.fetchRepoLanguages(
             repoName = repoName,
-            repoOwner = repoOwner
+            repoOwner = repoOwner,
+            repoId = repoId
         )
 
         when (response) {
@@ -178,10 +212,15 @@ class RepoDetailViewModel (
             is Result.Success -> {
                 repoDetailState.update { state ->
                     state.copy(
-                        languages = response.data
+                        languages = response.data.joinToString(" ,")
                     )
                 }
             }
         }
     }
+
+    private fun buildUrl(repoName: String, repoOwner: String): String {
+        return "https://github.com/$repoOwner/$repoName"
+    }
+
 }

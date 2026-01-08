@@ -17,7 +17,7 @@ interface RepoRepository {
     fun fetchIssuesPaginated(repoName: String, repoOwner: String, repoId: Long): Flow<PagingData<Issue>>
 
 
-    suspend fun fetchRepositoryReadme(repoOwner: String, repoName: String): Result<RepoReadme>
+    suspend fun fetchRepositoryReadme(repoOwner: String, repoName: String, repoId: Long): Result<RepoReadme>
     suspend fun fetchRepoById(repoId: Long): Result<Repository>
-    suspend fun fetchRepoLanguages(repoOwner: String, repoName: String): Result<List<String>>
+    suspend fun fetchRepoLanguages(repoOwner: String, repoName: String, repoId: Long): Result<List<String>>
 }

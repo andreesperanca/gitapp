@@ -1,7 +1,6 @@
 package hopeapps.dedev.feature_repo.presentation.details
 
-import android.text.method.LinkMovementMethod
-import android.widget.TextView
+import android.content.Intent
 import androidx.compose.foundation.layout.Box
 import androidx.compose.foundation.layout.Column
 import androidx.compose.foundation.layout.fillMaxWidth
@@ -24,36 +23,35 @@ import androidx.compose.runtime.mutableIntStateOf
 import androidx.compose.runtime.remember
 import androidx.compose.runtime.setValue
 import androidx.compose.ui.Modifier
+import androidx.compose.ui.platform.LocalContext
 import androidx.compose.ui.res.stringResource
-import androidx.compose.ui.tooling.preview.Preview
-import androidx.compose.ui.viewinterop.AndroidView
+import androidx.core.net.toUri
 import androidx.paging.compose.LazyPagingItems
 import androidx.paging.compose.collectAsLazyPagingItems
 import hopeapps.dedev.core.presentation.designsystem.R
 import hopeapps.dedev.core.presentation.designsystem.components.DefaultText
 import hopeapps.dedev.core.presentation.designsystem.components.DefaultTopAppBar
 import hopeapps.dedev.core.presentation.designsystem.screen.LoadingLayout
-import hopeapps.dedev.core.presentation.designsystem.theme.GitappTheme
-import hopeapps.dedev.feature_repo.domain.entity.Issue
 import hopeapps.dedev.feature_repo.domain.entity.PullRequest
 import hopeapps.dedev.feature_repo.presentation.details.content.IssuesContent
 import hopeapps.dedev.feature_repo.presentation.details.content.OverviewContent
 import hopeapps.dedev.feature_repo.presentation.details.content.PullRequestsContent
 import hopeapps.dedev.feature_repo.presentation.details.tab.TabNavItem
 import hopeapps.dedev.feature_repo.presentation.utils.IssueUiModel
-import io.noties.markwon.Markwon
+import kotlinx.coroutines.flow.collectLatest
 import org.koin.androidx.compose.koinViewModel
 
 
 @Composable
 fun RepoDetailsScreenRoot(
     repoId: Long,
-    viewModel: RepoDetailViewModel = koinViewModel()
+    viewModel: RepoDetailViewModel = koinViewModel(),
+    onBackListener: () -> Unit
 ) {
+    val context = LocalContext.current
     val state by viewModel.repoDetailState.collectAsState()
     val pullRequests = viewModel.pullRequestsPagingFlow.collectAsLazyPagingItems()
     val issues = viewModel.issuesPagingFlow.collectAsLazyPagingItems()
-
 
     LaunchedEffect(key1 = repoId) {
         viewModel.start(
@@ -61,11 +59,37 @@ fun RepoDetailsScreenRoot(
         )
     }
 
+    LaunchedEffect(Unit) {
+        viewModel.event.collectLatest { event ->
+            when (event) {
+                is DetailEvent.OpenRepoInWeb -> {
+                    val intent = Intent(
+                        Intent.ACTION_VIEW,
+                        event.url.toUri()
+                    )
+                    context.startActivity(intent)
+                }
+                is DetailEvent.ShareRepo -> {
+                    val intent = Intent(Intent.ACTION_SEND).apply {
+                        type = "text/plain"
+                        putExtra(Intent.EXTRA_TEXT, event.url)
+                    }
+
+                    context.startActivity(
+                        Intent.createChooser(intent, "Compartilhar repositório")
+                    )
+                }
+                DetailEvent.BackListener -> { onBackListener() }
+            }
+        }
+    }
+
     RepoDetailScreen(
         modifier = Modifier,
         state = state,
         pullRequests = pullRequests,
-        issues = issues
+        issues = issues,
+        onAction = viewModel::onAction
     )
 
 }
@@ -75,7 +99,8 @@ fun RepoDetailScreen(
     modifier: Modifier = Modifier,
     state: RepoDetailState,
     pullRequests: LazyPagingItems<PullRequest>,
-    issues: LazyPagingItems<IssueUiModel>
+    issues: LazyPagingItems<IssueUiModel>,
+    onAction: (DetailAction) -> Unit
 ) {
     var selectedTabIndex by remember { mutableIntStateOf(0) }
     val pagerState = rememberPagerState { TabNavItem.items.size }
@@ -98,7 +123,7 @@ fun RepoDetailScreen(
                     DefaultTopAppBar(
                         title = stringResource(R.string.repository_details),
                         navigationIcon = {
-                            IconButton(onClick = { }) {
+                            IconButton(onClick = { onAction(DetailAction.BackListener) } ) {
                                 Icon(
                                     imageVector = Icons.AutoMirrored.Filled.ArrowBack,
                                     contentDescription = null,
@@ -137,7 +162,6 @@ fun RepoDetailScreen(
                             modifier = Modifier
                                 .fillMaxWidth()
                                 .weight(1f)
-
                         ) { index ->
                             Box {
                                 when (index) {
@@ -150,17 +174,17 @@ fun RepoDetailScreen(
                                             watchers = state.watchers,
                                             issues = state.issues,
                                             repoName = state.name,
-                                            repoDescription = state.description
+                                            repoDescription = state.description,
+                                            openRepoInWeb = {
+                                                onAction(DetailAction.OpenRepoInWeb)
+                                            },
+                                            shareRepo = {
+                                                onAction(DetailAction.ShareRepo)
+                                            }
                                         )
                                     }
-
-                                    1 -> {
-                                        PullRequestsContent(pullRequests = pullRequests)
-                                    }
-
-                                    2 -> {
-                                        IssuesContent(issues = issues)
-                                    }
+                                    1 -> { PullRequestsContent(pullRequests = pullRequests) }
+                                    2 -> { IssuesContent(issues = issues) }
                                 }
                             }
                         }
@@ -169,36 +193,4 @@ fun RepoDetailScreen(
             )
         }
     )
-}
-
-
-@Composable
-fun MarkdownComponent(
-    modifier: Modifier = Modifier,
-    markdown: String
-) {
-    AndroidView(
-        modifier = modifier.fillMaxWidth(),
-        factory = { context ->
-            TextView(context).apply {
-                movementMethod = LinkMovementMethod.getInstance()
-            }
-        },
-        update = { textView ->
-            val markwon = Markwon.create(textView.context)
-            markwon.setMarkdown(textView, markdown)
-        }
-    )
-}
-
-
-@Preview
-@Composable
-private fun RepoDetailsScreenPreview() {
-    GitappTheme {
-//        RepoDetailScreen(
-//            state = RepoDetailState(),
-//
-//        )
-    }
 }

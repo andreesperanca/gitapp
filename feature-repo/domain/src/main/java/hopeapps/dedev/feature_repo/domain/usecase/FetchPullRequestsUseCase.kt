@@ -8,13 +8,15 @@ import hopeapps.dedev.feature_repo.domain.repository.RepoRepository
 class FetchPullRequestsUseCase(
     private val repoRepository: RepoRepository
 ) {
-    operator suspend fun invoke(
+    suspend operator fun invoke(
         repoName: String,
-        repoOwner: String
+        repoOwner: String,
+        repoId: Long
     ): Result<RepoReadme> {
         return repoRepository.fetchRepositoryReadme(
             repoName = repoName,
-            repoOwner = repoOwner
+            repoOwner = repoOwner,
+            repoId = repoId
         )
     }
 }
