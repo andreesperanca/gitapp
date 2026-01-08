@@ -4,9 +4,9 @@ import hopeapps.dedev.common.GitException
 import hopeapps.dedev.common.Result
 import hopeapps.dedev.core.database.model.UserEntity
 import hopeapps.dedev.core.network.models.UserDto
-import hopeapps.dedev.feature_users.data.datasource.LocalDataSource
-import hopeapps.dedev.feature_users.data.datasource.RemoteDataSource
-import hopeapps.dedev.feature_users.data.mapper.entityToUsers
+import hopeapps.dedev.feature_users.data.datasource.UserLocalDataSource
+import hopeapps.dedev.feature_users.data.datasource.UserRemoteDataSource
+import hopeapps.dedev.feature_users.data.mapper.toDomain
 import hopeapps.dedev.feature_users.data.mapper.toEntity
 import hopeapps.dedev.feature_users.domain.entity.User
 import io.mockk.coEvery
@@ -24,17 +24,17 @@ import org.junit.Test
 class UserRepositoryImplTest {
 
     private lateinit var repository: UserRepositoryImpl
-    private lateinit var remoteDataSource: RemoteDataSource
-    private lateinit var localDataSource: LocalDataSource
+    private lateinit var userRemoteDataSource: UserRemoteDataSource
+    private lateinit var userLocalDataSource: UserLocalDataSource
 
     @Before
     fun setup() {
-        remoteDataSource = mockk()
-        localDataSource = mockk(relaxed = true)
+        userRemoteDataSource = mockk()
+        userLocalDataSource = mockk(relaxed = true)
 
         repository = UserRepositoryImpl(
-            remoteDataSource = remoteDataSource,
-            localDataSource = localDataSource
+            userRemoteDataSource = userRemoteDataSource,
+            userLocalDataSource = userLocalDataSource
         )
     }
 
@@ -89,7 +89,7 @@ class UserRepositoryImplTest {
         )
 
         coEvery {
-            remoteDataSource.searchUser(userFilter)
+            userRemoteDataSource.searchUser(userFilter)
         } returns hopeapps.dedev.common.Result.Success(dtoUser)
 
         val result = repository.searchUser(userFilter)
@@ -98,7 +98,7 @@ class UserRepositoryImplTest {
         assertEquals(domainUser.following, (result as Result.Success).data.following)
 
         coVerify(exactly = 1) {
-            localDataSource.saveUser(dtoUser.toEntity())
+            userLocalDataSource.saveUser(dtoUser.toEntity())
         }
     }
 
@@ -107,7 +107,7 @@ class UserRepositoryImplTest {
         val networkError = GitException.NetworkError
 
         coEvery {
-            remoteDataSource.searchUser("andre")
+            userRemoteDataSource.searchUser("andre")
         } returns Result.Error(networkError)
 
         val result = repository.searchUser("andre")
@@ -116,7 +116,7 @@ class UserRepositoryImplTest {
         assertEquals(networkError, (result as Result.Error).error)
 
         coVerify(exactly = 0) {
-            localDataSource.saveUser(any())
+            userLocalDataSource.saveUser(any())
         }
     }
 
@@ -136,13 +136,13 @@ class UserRepositoryImplTest {
         )
 
         coEvery {
-            localDataSource.fetchRecentUsers()
+            userLocalDataSource.fetchRecentUsers()
         } returns Result.Success(entities)
 
         val result = repository.fetchRecentUsers()
 
         assertTrue(result is Result.Success)
-        assertEquals(entities.entityToUsers(), (result as Result.Success).data)
+        assertEquals(entities.toDomain(), (result as Result.Success).data)
     }
 
     @Test
@@ -150,7 +150,7 @@ class UserRepositoryImplTest {
         val error = GitException.UnknownError
 
         coEvery {
-            localDataSource.fetchRecentUsers()
+            userLocalDataSource.fetchRecentUsers()
         } returns Result.Error(error)
 
         val result = repository.fetchRecentUsers()

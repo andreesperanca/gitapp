@@ -12,7 +12,6 @@ class FetchRecentUsersUseCase(
 ) {
 
     suspend operator fun invoke(
-        userFilterText: String = ""
     ): Result<List<User>> {
         val users = withContext(Dispatchers.IO) { userRepository.fetchRecentUsers() }
         return users

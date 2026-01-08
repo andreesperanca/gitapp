@@ -29,13 +29,7 @@ fun UserDto.toEntity(): UserEntity {
     )
 }
 
-
-fun List<UserDto>.dtoToUsers(): List<User> {
-    return map { it.toDomain() }
-}
-
-
-fun UserEntity.toUser(): User {
+fun UserEntity.toDomain(): User {
     return User(
         login = login,
         avatarUrl = avatarUrl,
@@ -47,7 +41,7 @@ fun UserEntity.toUser(): User {
     )
 }
 
-fun List<UserEntity>.entityToUsers(): List<User> {
-    return map { it.toUser() }
+fun List<UserEntity>.toDomain(): List<User> {
+    return map { it.toDomain() }
 }
 

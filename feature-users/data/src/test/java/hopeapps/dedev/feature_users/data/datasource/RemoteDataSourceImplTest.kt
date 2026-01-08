@@ -18,7 +18,7 @@ import hopeapps.dedev.common.*
 class RemoteDataSourceImplTest {
 
     private val gitApi: GitApi = mockk()
-    private lateinit var remoteDataSource: RemoteDataSource
+    private lateinit var remoteDataSource: UserRemoteDataSource
 
     @Before
     fun setup() {

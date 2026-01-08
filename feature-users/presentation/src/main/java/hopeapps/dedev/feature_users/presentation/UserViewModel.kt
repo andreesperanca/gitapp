@@ -2,6 +2,7 @@ package hopeapps.dedev.feature_users.presentation
 
 import androidx.lifecycle.ViewModel
 import androidx.lifecycle.viewModelScope
+import hopeapps.dedev.common.GitException
 import hopeapps.dedev.common.Result
 import hopeapps.dedev.common.launchSuspend
 import hopeapps.dedev.feature_users.domain.entity.User
@@ -51,7 +52,7 @@ class UserViewModel(
             onResult = { response ->
                 when (response) {
                     is Result.Error -> {
-                        sendEvent(UserEvent.ShowSnackBar(message = "Error message!"))
+                        handleError(response.error)
                     }
                     is Result.Success -> {
                         fetchHistoricUsers()
@@ -100,7 +101,7 @@ class UserViewModel(
             onResult = { response ->
                 when (response) {
                     is Result.Error -> {
-                        sendEvent(UserEvent.ShowSnackBar(message = "Error message!"))
+                        handleError(response.error)
                     }
                     is Result.Success -> {
                         state.update { it.copy(recentUsers = response.data) }
@@ -109,4 +110,20 @@ class UserViewModel(
             }
         )
     }
+
+
+    private fun handleError(exception: GitException) {
+        when (exception) {
+            GitException.NetworkError -> {
+                sendEvent(UserEvent.ShowSnackBar(message = "Network Exception"))
+            }
+            GitException.UnknownError -> {
+                sendEvent(UserEvent.ShowSnackBar(message = "Unknown Exception"))
+            }
+        }
+    }
+
+
+
+
 }

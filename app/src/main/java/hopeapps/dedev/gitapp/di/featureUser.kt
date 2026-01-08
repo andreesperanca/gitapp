@@ -1,8 +1,8 @@
 package hopeapps.dedev.gitapp.di
 
-import hopeapps.dedev.feature_users.data.datasource.LocalDataSource
+import hopeapps.dedev.feature_users.data.datasource.UserLocalDataSource
 import hopeapps.dedev.feature_users.data.datasource.LocalDataSourceImpl
-import hopeapps.dedev.feature_users.data.datasource.RemoteDataSource
+import hopeapps.dedev.feature_users.data.datasource.UserRemoteDataSource
 import hopeapps.dedev.feature_users.data.datasource.RemoteDataSourceImpl
 import hopeapps.dedev.feature_users.data.repository.UserRepositoryImpl
 import hopeapps.dedev.feature_users.domain.repository.UserRepository
@@ -15,8 +15,8 @@ import org.koin.dsl.module
 
 val featureUsers = module {
     single<UserRepository> { UserRepositoryImpl(get(), get()) }
-    single<LocalDataSource> { LocalDataSourceImpl(get()) }
-    single<RemoteDataSource> { RemoteDataSourceImpl(get()) }
+    single<UserLocalDataSource> { LocalDataSourceImpl(get()) }
+    single<UserRemoteDataSource> { RemoteDataSourceImpl(get()) }
     single<SearchUserUseCase> { SearchUserUseCase(get() ) }
     single<FetchRecentUsersUseCase> { FetchRecentUsersUseCase(get() ) }
     viewModelOf(::UserViewModel)

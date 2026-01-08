@@ -12,11 +12,8 @@ import kotlinx.coroutines.flow.Flow
 interface RepoRepository {
     fun fetchRepoPaginated(userFilterText: String): Flow<PagingData<Repository>>
     fun fetchSearchRepoPaginated(filter: RepoSearchFilter, userFilterText: String): Flow<PagingData<Repository>>
-
     fun fetchPullRequestsPaginated(repoName: String, repoOwner: String, repoId: Long): Flow<PagingData<PullRequest>>
     fun fetchIssuesPaginated(repoName: String, repoOwner: String, repoId: Long): Flow<PagingData<Issue>>
-
-
     suspend fun fetchRepositoryReadme(repoOwner: String, repoName: String, repoId: Long): Result<RepoReadme>
     suspend fun fetchRepoById(repoId: Long): Result<Repository>
     suspend fun fetchRepoLanguages(repoOwner: String, repoName: String, repoId: Long): Result<List<String>>

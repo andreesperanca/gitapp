@@ -7,17 +7,22 @@ import hopeapps.dedev.core.database.model.UserEntity
 
 class LocalDataSourceImpl(
     private val userDao: UserDao
-) : LocalDataSource {
+) : UserLocalDataSource {
 
     override suspend fun fetchRecentUsers(): Result<List<UserEntity>> {
         return try {
             Result.Success(userDao.fetchUsers())
         } catch (e: Exception) {
+            e.printStackTrace()
             Result.Error(GitException.UnknownError)
         }
     }
 
     override suspend fun saveUser(user: UserEntity) {
-        userDao.saveRecentUsers(user)
+        try {
+            userDao.saveRecentUsers(user)
+        } catch (e: Exception) {
+            e.printStackTrace()
+        }
     }
 }
