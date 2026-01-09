@@ -122,8 +122,4 @@ class UserViewModel(
             }
         }
     }
-
-
-
-
 }

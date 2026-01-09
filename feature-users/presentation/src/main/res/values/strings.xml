@@ -3,4 +3,5 @@
     <string name="recent_users">Usuários Recentes</string>
     <string name="is_empty">Está vazio</string>
     <string name="search_users">Busque usuários</string>
+    <string name="app_name">GitApp</string>
 </resources>
