@@ -21,10 +21,8 @@ class RepositoriesViewModel(
     private val repoUseCase: RepoUseCase
 ) : ViewModel() {
 
-    var userLogin: String = ""
+    var userTrigger = MutableStateFlow<String?>(null)
         private set
-
-    private val userTrigger = MutableStateFlow<String?>(null)
 
     val repoPagingFlow: StateFlow<PagingData<Repository>> =
         userTrigger

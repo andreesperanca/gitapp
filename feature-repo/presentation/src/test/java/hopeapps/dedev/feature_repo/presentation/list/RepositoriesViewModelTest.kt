@@ -4,6 +4,7 @@ import androidx.paging.PagingData
 import app.cash.turbine.test
 import hopeapps.dedev.common.MainDispatcherRule
 import hopeapps.dedev.feature_repo.domain.entity.Repository
+import hopeapps.dedev.feature_repo.domain.usecase.RepoUseCase
 import io.mockk.every
 import io.mockk.mockk
 import io.mockk.verify
@@ -21,7 +22,7 @@ class RepositoriesViewModelTest {
     @get:Rule
     val dispatcherRule = MainDispatcherRule()
 
-    private lateinit var useCase: FetchRepositoryPaginatedUseCase
+    private lateinit var useCase: RepoUseCase
     private lateinit var viewModel: RepositoriesViewModel
 
     @Before
@@ -45,16 +46,19 @@ class RepositoriesViewModelTest {
                     forks = 1,
                     language = "Java",
                     lastUpdate = "LastUpdate",
-                    isFork = false
+                    isFork = false,
+                    repoOwner = "andreesperanca",
+                    watchers = 1,
+                    issues = 1
                 )
             )
         )
 
-        every { useCase.invoke(login) } returns flowOf(pagingData)
+        every { useCase.fetchRepositoryPaginated(login) } returns flowOf(pagingData)
 
         viewModel.init(login)
 
-        assertEquals(login, viewModel.userLogin)
+        assertEquals(login, viewModel.userTrigger.value)
 
         viewModel.repoPagingFlow.test {
             val item = awaitItem()
@@ -63,7 +67,7 @@ class RepositoriesViewModelTest {
         }
 
         verify(exactly = 1) {
-            useCase.invoke(login)
+            useCase.fetchRepositoryPaginated(login)
         }
     }
 
@@ -71,9 +75,9 @@ class RepositoriesViewModelTest {
     fun `searchRepositories should update paging flow`() = runTest {
         val login = "andreesperanca"
 
-        every { useCase.invoke(login) } returns flowOf(PagingData.empty())
+        every { useCase.fetchRepositoryPaginated(login) } returns flowOf(PagingData.empty())
 
-        viewModel.searchRepositories(login)
+        viewModel.init(login)
 
         viewModel.repoPagingFlow.test {
             awaitItem()
@@ -81,7 +85,7 @@ class RepositoriesViewModelTest {
         }
 
         verify(exactly = 1) {
-            useCase(login)
+            useCase.fetchRepositoryPaginated(login)
         }
     }
 
