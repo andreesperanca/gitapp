@@ -1,3 +1,4 @@
 <resources>
     <string name="app_name">gitapp</string>
+    <string name="banner_without_connection">Sem conexão com a internet, os dados podem estar desatualizados</string>
 </resources>
