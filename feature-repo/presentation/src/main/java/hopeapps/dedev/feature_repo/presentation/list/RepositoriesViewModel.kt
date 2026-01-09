@@ -6,24 +6,19 @@ import androidx.lifecycle.viewModelScope
 import androidx.paging.PagingData
 import androidx.paging.cachedIn
 import hopeapps.dedev.feature_repo.domain.entity.Repository
-import hopeapps.dedev.feature_repo.domain.usecase.FetchRepositoryPaginatedUseCase
-import kotlinx.coroutines.Dispatchers
+import hopeapps.dedev.feature_repo.domain.usecase.RepoUseCase
 import kotlinx.coroutines.ExperimentalCoroutinesApi
-import kotlinx.coroutines.flow.Flow
 import kotlinx.coroutines.flow.MutableStateFlow
 import kotlinx.coroutines.flow.SharingStarted
 import kotlinx.coroutines.flow.StateFlow
-import kotlinx.coroutines.flow.collectLatest
 import kotlinx.coroutines.flow.filterNotNull
 import kotlinx.coroutines.flow.flatMapLatest
-import kotlinx.coroutines.flow.flowOf
 import kotlinx.coroutines.flow.stateIn
-import kotlinx.coroutines.launch
 
 
 @OptIn(ExperimentalCoroutinesApi::class)
 class RepositoriesViewModel(
-    private val searchRepositoryUseCase: FetchRepositoryPaginatedUseCase
+    private val repoUseCase: RepoUseCase
 ) : ViewModel() {
 
     var userLogin: String = ""
@@ -35,7 +30,7 @@ class RepositoriesViewModel(
         userTrigger
             .filterNotNull()
             .flatMapLatest { userLogin ->
-                searchRepositoryUseCase(userTrigger.value ?: "andreesperanca")
+                repoUseCase.fetchRepositoryPaginated(userTrigger.value ?: "andreesperanca")
             }
             .cachedIn(viewModelScope)
             .stateIn(

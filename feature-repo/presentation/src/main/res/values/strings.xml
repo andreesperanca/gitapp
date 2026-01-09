@@ -19,4 +19,7 @@
     <string name="watchers">Watchers</string>
     <string name="read_me">Leia-me</string>
     <string name="languages">Linguagens</string>
+    <string name="share_repository">Compartilhar repositório</string>
+    <string name="network_error">Problemas de internet</string>
+    <string name="unknown_error">Erro de causa desconhecida</string>
 </resources>

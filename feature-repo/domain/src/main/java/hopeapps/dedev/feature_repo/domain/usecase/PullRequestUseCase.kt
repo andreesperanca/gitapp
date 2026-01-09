@@ -1,19 +1,19 @@
 package hopeapps.dedev.feature_repo.domain.usecase
 
-import hopeapps.dedev.common.Result
-import hopeapps.dedev.feature_repo.domain.entity.RepoReadme
+import androidx.paging.PagingData
+import hopeapps.dedev.feature_repo.domain.entity.PullRequest
 import hopeapps.dedev.feature_repo.domain.repository.RepoRepository
+import kotlinx.coroutines.flow.Flow
 
-
-class FetchPullRequestsUseCase(
+class PullRequestUseCase(
     private val repoRepository: RepoRepository
 ) {
-    suspend operator fun invoke(
+    fun fetchPullRequestsPaginated(
         repoName: String,
         repoOwner: String,
         repoId: Long
-    ): Result<RepoReadme> {
-        return repoRepository.fetchRepositoryReadme(
+    ): Flow<PagingData<PullRequest>> {
+        return repoRepository.fetchPullRequestsPaginated(
             repoName = repoName,
             repoOwner = repoOwner,
             repoId = repoId

@@ -1,4 +1,4 @@
-package hopeapps.dedev.feature_repo.presentation.details
+package hopeapps.dedev.feature_repo.presentation.components
 
 import android.text.method.LinkMovementMethod
 import android.widget.TextView

@@ -1,4 +1,4 @@
-package hopeapps.dedev.feature_repo.presentation.details
+package hopeapps.dedev.feature_repo.presentation.components
 
 import androidx.compose.foundation.layout.Arrangement
 import androidx.compose.foundation.layout.Column
@@ -12,12 +12,13 @@ import androidx.compose.material3.Surface
 import androidx.compose.runtime.Composable
 import androidx.compose.ui.Modifier
 import androidx.compose.ui.graphics.Color
+import androidx.compose.ui.tooling.preview.Preview
 import androidx.compose.ui.unit.dp
 import hopeapps.dedev.core.presentation.designsystem.LocalSpacing
 import hopeapps.dedev.core.presentation.designsystem.components.DefaultText
-import hopeapps.dedev.feature_repo.domain.entity.Issue
+import hopeapps.dedev.core.presentation.designsystem.theme.GitappTheme
 import hopeapps.dedev.feature_repo.domain.entity.Label
-import hopeapps.dedev.feature_repo.presentation.utils.IssueUiModel
+import hopeapps.dedev.feature_repo.presentation.model.IssueUiModel
 
 
 @Composable
@@ -83,6 +84,24 @@ fun LabelChip(
             text = label.name,
             modifier = Modifier.padding(horizontal = 10.dp, vertical = 4.dp),
             color = Color(label.colorHex)
+        )
+    }
+}
+
+
+@Preview
+@Composable
+fun IssueContentPreview() {
+    GitappTheme {
+        IssueItem(
+            modifier = Modifier,
+            issue = IssueUiModel(
+                id = 1,
+                title = "Issue title",
+                author = "Author",
+                createdAtFormatted = "",
+                labels = listOf(Label(name = "Bug", colorHex = 0xFF0000, id = 1))
+            )
         )
     }
 }

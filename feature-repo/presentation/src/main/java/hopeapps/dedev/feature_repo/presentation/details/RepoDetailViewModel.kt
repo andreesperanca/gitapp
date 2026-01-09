@@ -1,23 +1,24 @@
 package hopeapps.dedev.feature_repo.presentation.details
 
-import android.os.Build
 import android.util.Base64
-import androidx.annotation.RequiresApi
 import androidx.lifecycle.ViewModel
 import androidx.lifecycle.viewModelScope
 import androidx.paging.PagingData
 import androidx.paging.cachedIn
 import androidx.paging.map
+import hopeapps.dedev.common.GitException
 import hopeapps.dedev.common.Result
 import hopeapps.dedev.feature_repo.domain.entity.PullRequest
-import hopeapps.dedev.feature_repo.domain.usecase.FetchRepoReadmeUseCase
+import hopeapps.dedev.feature_repo.domain.usecase.IssueUseCase
+import hopeapps.dedev.feature_repo.domain.usecase.PullRequestUseCase
 import hopeapps.dedev.feature_repo.domain.usecase.RepoUseCase
-import hopeapps.dedev.feature_repo.presentation.details.DetailEvent.*
+import hopeapps.dedev.feature_repo.presentation.details.DetailEvent.BackListener
+import hopeapps.dedev.feature_repo.presentation.details.DetailEvent.OpenRepoInWeb
+import hopeapps.dedev.feature_repo.presentation.details.DetailEvent.ShareRepo
 import hopeapps.dedev.feature_repo.presentation.details.tab.RepoParams
-import hopeapps.dedev.feature_repo.presentation.utils.IssueUiModel
-import hopeapps.dedev.feature_repo.presentation.utils.toUiModel
+import hopeapps.dedev.feature_repo.presentation.mapper.toUiModel
+import hopeapps.dedev.feature_repo.presentation.model.IssueUiModel
 import kotlinx.coroutines.ExperimentalCoroutinesApi
-import kotlinx.coroutines.delay
 import kotlinx.coroutines.flow.MutableSharedFlow
 import kotlinx.coroutines.flow.MutableStateFlow
 import kotlinx.coroutines.flow.SharingStarted
@@ -31,9 +32,10 @@ import kotlinx.coroutines.launch
 
 
 @OptIn(ExperimentalCoroutinesApi::class)
-class RepoDetailViewModel (
-    val fetchRepoReadmeUseCase: FetchRepoReadmeUseCase,
-    val repoUseCase: RepoUseCase
+class RepoDetailViewModel(
+    val repoUseCase: RepoUseCase,
+    val pullRequestUseCase: PullRequestUseCase,
+    val issueUseCase: IssueUseCase
 ) : ViewModel() {
 
     var repoDetailState = MutableStateFlow(RepoDetailState())
@@ -48,7 +50,7 @@ class RepoDetailViewModel (
         repoParams
             .filterNotNull()
             .flatMapLatest { state ->
-                repoUseCase.fetchPullRequestsPaginated(
+                pullRequestUseCase.fetchPullRequestsPaginated(
                     repoName = state.repoName,
                     repoOwner = state.repoOwner,
                     repoId = state.repoId
@@ -66,7 +68,7 @@ class RepoDetailViewModel (
         repoParams
             .filterNotNull()
             .flatMapLatest { state ->
-                repoUseCase.fetchIssuesPaginated(
+                issueUseCase.fetchIssuesPaginated(
                     repoName = state.repoName,
                     repoOwner = state.repoOwner,
                     repoId = state.repoId
@@ -124,7 +126,10 @@ class RepoDetailViewModel (
                             issues = response.data.issues,
                             name = response.data.name,
                             description = response.data.description,
-                            urlRepo = buildUrl(repoName = response.data.name, repoOwner = response.data.repoOwner)
+                            urlRepo = buildUrl(
+                                repoName = response.data.name,
+                                repoOwner = response.data.repoOwner
+                            )
                         )
                     }
                     fetchRepoReadMe(
@@ -138,11 +143,11 @@ class RepoDetailViewModel (
                         repoId = repoId
                     )
                 }
-                is Result.Error -> {
 
+                is Result.Error -> {
+                    handleError(exception = response.error)
                 }
             }
-            delay(500)
             repoDetailState.update { state ->
                 state.copy(isLoading = false)
             }
@@ -174,7 +179,7 @@ class RepoDetailViewModel (
         repoOwner: String,
         repoId: Long
     ) {
-        val response = fetchRepoReadmeUseCase(
+        val response = repoUseCase.fetchRepositoryReadme(
             repoName = repoName,
             repoOwner = repoOwner,
             repoId = repoId
@@ -182,8 +187,9 @@ class RepoDetailViewModel (
 
         when (response) {
             is Result.Error -> {
-                //Error controller
+                handleError(exception = response.error)
             }
+
             is Result.Success -> {
                 repoDetailState.update { state ->
                     state.copy(
@@ -207,8 +213,9 @@ class RepoDetailViewModel (
 
         when (response) {
             is Result.Error -> {
-                //Error controller
+                handleError(exception = response.error)
             }
+
             is Result.Success -> {
                 repoDetailState.update { state ->
                     state.copy(
@@ -223,4 +230,15 @@ class RepoDetailViewModel (
         return "https://github.com/$repoOwner/$repoName"
     }
 
+    private fun handleError(exception: GitException) {
+        when (exception) {
+            GitException.NetworkError -> {
+                sendEvent(DetailEvent.ShowSnackBar(message = "Network Error"))
+            }
+
+            GitException.UnknownError -> {
+                sendEvent(DetailEvent.ShowSnackBar(message = "Unknown Error"))
+            }
+        }
+    }
 }

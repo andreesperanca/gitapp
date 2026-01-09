@@ -12,15 +12,16 @@ import androidx.compose.runtime.Composable
 import androidx.compose.ui.Alignment
 import androidx.compose.ui.Modifier
 import androidx.compose.ui.res.stringResource
+import androidx.compose.ui.tooling.preview.Preview
 import androidx.paging.LoadState
 import androidx.paging.compose.LazyPagingItems
 import hopeapps.dedev.core.presentation.designsystem.LocalSpacing
 import hopeapps.dedev.core.presentation.designsystem.components.EmptyState
 import hopeapps.dedev.core.presentation.designsystem.components.ErrorState
 import hopeapps.dedev.core.presentation.designsystem.screen.LoadingLayout
-import hopeapps.dedev.feature_repo.domain.entity.Issue
-import hopeapps.dedev.feature_repo.presentation.details.IssueItem
-import hopeapps.dedev.feature_repo.presentation.utils.IssueUiModel
+import hopeapps.dedev.core.presentation.designsystem.theme.GitappTheme
+import hopeapps.dedev.feature_repo.presentation.components.IssueItem
+import hopeapps.dedev.feature_repo.presentation.model.IssueUiModel
 
 @Composable
 fun IssuesContent(

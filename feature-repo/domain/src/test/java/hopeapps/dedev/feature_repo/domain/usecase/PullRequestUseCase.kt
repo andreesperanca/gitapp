@@ -1,11 +1,17 @@
 package hopeapps.dedev.feature_repo.domain.usecase
 
 import androidx.paging.PagingData
+import hopeapps.dedev.common.GitException
+import hopeapps.dedev.common.Result
 import hopeapps.dedev.feature_repo.domain.entity.ForkFilterType
+import hopeapps.dedev.feature_repo.domain.entity.PullRequest
+import hopeapps.dedev.feature_repo.domain.entity.RepoReadme
 import hopeapps.dedev.feature_repo.domain.entity.RepoSearchFilter
 import hopeapps.dedev.feature_repo.domain.entity.RepoSort
 import hopeapps.dedev.feature_repo.domain.entity.Repository
 import hopeapps.dedev.feature_repo.domain.repository.RepoRepository
+import io.mockk.coEvery
+import io.mockk.coVerify
 import io.mockk.confirmVerified
 import io.mockk.every
 import io.mockk.mockk
@@ -19,51 +25,44 @@ import org.junit.Test
 
 @Suppress("UnusedFlow", "UNUSED_FLOW_INSPECTION")
 @OptIn(ExperimentalCoroutinesApi::class)
-class SearchRepositoryPaginatedUseCaseTest {
+class PullRequestUseCaseTest {
 
     private lateinit var repository: RepoRepository
-    private lateinit var useCase: SearchRepositoryPaginatedUseCase
+    private lateinit var useCase: PullRequestUseCase
 
     @Before
     fun setup() {
         repository = mockk()
-        useCase = SearchRepositoryPaginatedUseCase(repository)
+        useCase = PullRequestUseCase(repository)
     }
 
     @Test
-    fun `invoke should delegate search call to repository`() = runTest {
-        val filter = RepoSearchFilter(
-            user = "",
-            language = "",
-            forkFilter = ForkFilterType.OnlyForks,
-            sort = RepoSort.Forks
-        )
-        val user = "andreesperanca"
-
-        val pagingFlow = flowOf(PagingData.empty<Repository>())
+    fun `invoke fetchPullRequestsPaginated should delegate call to repository`() = runTest {
+        val pagingFlow = flowOf(PagingData.empty<PullRequest>())
 
         every {
-            repository.fetchSearchRepoPaginated(
-                filter = filter,
-                userFilterText = user
+            repository.fetchPullRequestsPaginated(
+                repoName = "teste",
+                repoOwner = "teste",
+                repoId = 0
             )
         } returns pagingFlow
 
-        val result = useCase.invoke(
-            filter = filter,
-            userFilterText = user
+        val result = useCase.fetchPullRequestsPaginated(
+            repoName = "teste",
+            repoOwner = "teste",
+            repoId = 0
         )
 
         assertSame(pagingFlow, result)
 
         verify(exactly = 1) {
-            repository.fetchSearchRepoPaginated(
-                filter = filter,
-                userFilterText = user
+            repository.fetchPullRequestsPaginated(
+                repoName = "teste",
+                repoOwner = "teste",
+                repoId = 0
             )
         }
-
-        confirmVerified(repository)
     }
 
 }

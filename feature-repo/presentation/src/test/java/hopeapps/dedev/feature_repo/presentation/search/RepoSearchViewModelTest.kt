@@ -5,7 +5,6 @@ import app.cash.turbine.test
 import hopeapps.dedev.common.MainDispatcherRule
 import hopeapps.dedev.feature_repo.domain.entity.RepoSearchFilter
 import hopeapps.dedev.feature_repo.domain.entity.RepoSort
-import hopeapps.dedev.feature_repo.domain.usecase.SearchRepositoryPaginatedUseCase
 import io.mockk.every
 import io.mockk.mockk
 import io.mockk.verify

@@ -17,7 +17,7 @@ import androidx.paging.compose.LazyPagingItems
 import hopeapps.dedev.core.presentation.designsystem.LocalSpacing
 import hopeapps.dedev.core.presentation.designsystem.components.EmptyState
 import hopeapps.dedev.core.presentation.designsystem.components.ErrorState
-import hopeapps.dedev.core.presentation.designsystem.components.PullRequestItem
+import hopeapps.dedev.feature_repo.presentation.components.PullRequestItem
 import hopeapps.dedev.core.presentation.designsystem.screen.LoadingLayout
 import hopeapps.dedev.feature_repo.domain.entity.PullRequest
 

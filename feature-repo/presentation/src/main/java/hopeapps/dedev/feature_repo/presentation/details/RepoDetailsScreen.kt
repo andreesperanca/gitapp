@@ -13,6 +13,8 @@ import androidx.compose.material3.Icon
 import androidx.compose.material3.IconButton
 import androidx.compose.material3.MaterialTheme
 import androidx.compose.material3.Scaffold
+import androidx.compose.material3.SnackbarHost
+import androidx.compose.material3.SnackbarHostState
 import androidx.compose.material3.Tab
 import androidx.compose.material3.TabRow
 import androidx.compose.runtime.Composable
@@ -21,6 +23,7 @@ import androidx.compose.runtime.collectAsState
 import androidx.compose.runtime.getValue
 import androidx.compose.runtime.mutableIntStateOf
 import androidx.compose.runtime.remember
+import androidx.compose.runtime.rememberCoroutineScope
 import androidx.compose.runtime.setValue
 import androidx.compose.ui.Modifier
 import androidx.compose.ui.platform.LocalContext
@@ -37,8 +40,9 @@ import hopeapps.dedev.feature_repo.presentation.details.content.IssuesContent
 import hopeapps.dedev.feature_repo.presentation.details.content.OverviewContent
 import hopeapps.dedev.feature_repo.presentation.details.content.PullRequestsContent
 import hopeapps.dedev.feature_repo.presentation.details.tab.TabNavItem
-import hopeapps.dedev.feature_repo.presentation.utils.IssueUiModel
+import hopeapps.dedev.feature_repo.presentation.model.IssueUiModel
 import kotlinx.coroutines.flow.collectLatest
+import kotlinx.coroutines.launch
 import org.koin.androidx.compose.koinViewModel
 
 
@@ -52,6 +56,9 @@ fun RepoDetailsScreenRoot(
     val state by viewModel.repoDetailState.collectAsState()
     val pullRequests = viewModel.pullRequestsPagingFlow.collectAsLazyPagingItems()
     val issues = viewModel.issuesPagingFlow.collectAsLazyPagingItems()
+    val snackBarHostState = remember { SnackbarHostState() }
+    val scope = rememberCoroutineScope()
+    val shareTitle = stringResource(hopeapps.dedev.feature_repo.presentation.R.string.share_repository)
 
     LaunchedEffect(key1 = repoId) {
         viewModel.start(
@@ -74,12 +81,14 @@ fun RepoDetailsScreenRoot(
                         type = "text/plain"
                         putExtra(Intent.EXTRA_TEXT, event.url)
                     }
-
-                    context.startActivity(
-                        Intent.createChooser(intent, "Compartilhar repositório")
-                    )
+                    context.startActivity(Intent.createChooser( intent, shareTitle))
                 }
                 DetailEvent.BackListener -> { onBackListener() }
+                is DetailEvent.ShowSnackBar -> {
+                    scope.launch {
+                        snackBarHostState.showSnackbar(message = event.message)
+                    }
+                }
             }
         }
     }
@@ -89,7 +98,8 @@ fun RepoDetailsScreenRoot(
         state = state,
         pullRequests = pullRequests,
         issues = issues,
-        onAction = viewModel::onAction
+        onAction = viewModel::onAction,
+        snackBarHostState = snackBarHostState
     )
 
 }
@@ -100,7 +110,8 @@ fun RepoDetailScreen(
     state: RepoDetailState,
     pullRequests: LazyPagingItems<PullRequest>,
     issues: LazyPagingItems<IssueUiModel>,
-    onAction: (DetailAction) -> Unit
+    onAction: (DetailAction) -> Unit,
+    snackBarHostState: SnackbarHostState
 ) {
     var selectedTabIndex by remember { mutableIntStateOf(0) }
     val pagerState = rememberPagerState { TabNavItem.items.size }
@@ -119,6 +130,9 @@ fun RepoDetailScreen(
         isLoading = state.isLoading,
         content = {
             Scaffold(
+                snackbarHost = {
+                    SnackbarHost(hostState = snackBarHostState)
+                },
                 topBar = {
                     DefaultTopAppBar(
                         title = stringResource(R.string.repository_details),

@@ -5,7 +5,6 @@ import androidx.compose.foundation.layout.Arrangement
 import androidx.compose.foundation.layout.Box
 import androidx.compose.foundation.layout.PaddingValues
 import androidx.compose.foundation.layout.fillMaxSize
-import androidx.compose.foundation.layout.navigationBarsPadding
 import androidx.compose.foundation.layout.padding
 import androidx.compose.foundation.lazy.LazyColumn
 import androidx.compose.foundation.lazy.rememberLazyListState
@@ -23,18 +22,16 @@ import androidx.compose.ui.Alignment
 import androidx.compose.ui.Modifier
 import androidx.compose.ui.res.stringResource
 import androidx.compose.ui.tooling.preview.Preview
-import androidx.compose.ui.unit.dp
 import androidx.paging.LoadState
 import androidx.paging.PagingData
 import androidx.paging.compose.LazyPagingItems
 import androidx.paging.compose.collectAsLazyPagingItems
-import androidx.paging.compose.itemKey
 import hopeapps.dedev.core.presentation.designsystem.LocalSpacing
 import hopeapps.dedev.core.presentation.designsystem.R
 import hopeapps.dedev.core.presentation.designsystem.components.DefaultTopAppBar
 import hopeapps.dedev.core.presentation.designsystem.components.EmptyState
 import hopeapps.dedev.core.presentation.designsystem.components.ErrorState
-import hopeapps.dedev.core.presentation.designsystem.components.RepositoryItem
+import hopeapps.dedev.feature_repo.presentation.components.RepositoryItem
 import hopeapps.dedev.core.presentation.designsystem.screen.LoadingLayout
 import hopeapps.dedev.feature_repo.domain.entity.Repository
 import kotlinx.coroutines.flow.flowOf
@@ -49,9 +46,8 @@ fun RepositoriesScreenRoot(
     navigateToRepositoryDetails: (repoId: Long) -> Unit,
     backButtonListener: () -> Unit
 ) {
-    LaunchedEffect(true) {
-        viewModel.init(userLogin)
-    }
+
+    LaunchedEffect(true) { viewModel.init(userLogin) }
     val repositories = viewModel.repoPagingFlow.collectAsLazyPagingItems()
 
     RepositoriesScreen(
@@ -64,8 +60,10 @@ fun RepositoriesScreenRoot(
         },
         backButtonListener = {
             backButtonListener()
-        }
+        },
+
     )
+
 }
 
 
@@ -154,7 +152,7 @@ fun RepositoriesScreen(
                                 .align(Alignment.Center)
                                 .padding(horizontal = LocalSpacing.current.large),
                             message = stringResource(
-                                hopeapps.dedev.feature_repo.presentation.R.string.without_connection
+                                hopeapps.dedev.feature_repo.presentation.R.string.error_message
                             )
                         )
                     }
@@ -183,35 +181,15 @@ fun RepositoriesScreen(
 fun UserScreenPreview() {
 
     val pagingItems = flowOf(
-        PagingData.from(fakeData)
+        PagingData.from(emptyList<Repository>())
     ).collectAsLazyPagingItems()
 
     MaterialTheme {
         RepositoriesScreen(
             repositories = pagingItems,
-            onSearchClick = {
-
-            },
-            onRepositoryClick = {
-
-            },
+            onSearchClick = { },
+            onRepositoryClick = { },
             backButtonListener = { }
         )
     }
 }
-
-private val fakeData = listOf(
-    Repository(
-        id = 1,
-        name = "",
-        description = "",
-        stars = 1,
-        forks = 1,
-        language = "",
-        lastUpdate = "",
-        isFork = false,
-        watchers = 1,
-        issues = 1,
-        repoOwner = ""
-    )
-)

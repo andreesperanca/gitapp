@@ -15,7 +15,6 @@ import androidx.compose.material.icons.rounded.Share
 import androidx.compose.material3.Icon
 import androidx.compose.material3.IconButton
 import androidx.compose.material3.MaterialTheme
-import androidx.compose.material3.Text
 import androidx.compose.runtime.Composable
 import androidx.compose.ui.Alignment
 import androidx.compose.ui.Modifier
@@ -28,7 +27,7 @@ import hopeapps.dedev.core.presentation.designsystem.components.DefaultText
 import hopeapps.dedev.core.presentation.designsystem.components.DefaultTitle
 import hopeapps.dedev.core.presentation.designsystem.components.InfoItem
 import hopeapps.dedev.core.presentation.designsystem.theme.GitappTheme
-import hopeapps.dedev.feature_repo.presentation.details.MarkdownComponent
+import hopeapps.dedev.feature_repo.presentation.components.MarkdownComponent
 
 @Composable
 fun OverviewContent(

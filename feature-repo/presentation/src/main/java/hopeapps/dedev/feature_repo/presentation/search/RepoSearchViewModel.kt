@@ -9,7 +9,7 @@ import hopeapps.dedev.feature_repo.domain.entity.ForkFilterType
 import hopeapps.dedev.feature_repo.domain.entity.RepoSearchFilter
 import hopeapps.dedev.feature_repo.domain.entity.RepoSort
 import hopeapps.dedev.feature_repo.domain.entity.Repository
-import hopeapps.dedev.feature_repo.domain.usecase.SearchRepositoryPaginatedUseCase
+import hopeapps.dedev.feature_repo.domain.usecase.RepoUseCase
 import kotlinx.coroutines.ExperimentalCoroutinesApi
 import kotlinx.coroutines.flow.MutableStateFlow
 import kotlinx.coroutines.flow.SharingStarted
@@ -21,7 +21,7 @@ import kotlinx.coroutines.flow.update
 
 @OptIn(ExperimentalCoroutinesApi::class)
 class RepoSearchViewModel(
-    private val searchRepositoryPaginatedUseCase: SearchRepositoryPaginatedUseCase
+    private val repoUseCase: RepoUseCase
 ) : ViewModel() {
 
     var repoSearchFilter = MutableStateFlow(RepoSearchFilter())
@@ -31,7 +31,7 @@ class RepoSearchViewModel(
 
     val repoPagingFlow: StateFlow<PagingData<Repository>> =
         searchTrigger.flatMapLatest { filter ->
-            searchRepositoryPaginatedUseCase(filter = filter, userFilterText = filter.user ?: "")
+            repoUseCase.searchRepositoryPaginated(filter = filter, userFilterText = filter.user ?: "")
         }.cachedIn(viewModelScope)
             .stateIn(
                 scope = viewModelScope,

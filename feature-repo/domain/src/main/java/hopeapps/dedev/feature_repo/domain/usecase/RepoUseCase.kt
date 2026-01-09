@@ -2,8 +2,8 @@ package hopeapps.dedev.feature_repo.domain.usecase
 
 import androidx.paging.PagingData
 import hopeapps.dedev.common.Result
-import hopeapps.dedev.feature_repo.domain.entity.Issue
-import hopeapps.dedev.feature_repo.domain.entity.PullRequest
+import hopeapps.dedev.feature_repo.domain.entity.RepoReadme
+import hopeapps.dedev.feature_repo.domain.entity.RepoSearchFilter
 import hopeapps.dedev.feature_repo.domain.entity.Repository
 import hopeapps.dedev.feature_repo.domain.repository.RepoRepository
 import kotlinx.coroutines.Dispatchers
@@ -14,6 +14,22 @@ import kotlinx.coroutines.withContext
 class RepoUseCase(
     private val repoRepository: RepoRepository
 ) {
+
+    fun searchRepositoryPaginated(
+        filter: RepoSearchFilter,
+        userFilterText: String
+    ): Flow<PagingData<Repository>> {
+        return repoRepository.fetchSearchRepoPaginated(
+            filter = filter,
+            userFilterText = userFilterText
+        )
+    }
+
+    fun fetchRepositoryPaginated(
+        userFilterText: String
+    ): Flow<PagingData<Repository>> {
+        return repoRepository.fetchRepoPaginated(userFilterText)
+    }
 
 
     suspend fun fetchRepoById(
@@ -38,32 +54,17 @@ class RepoUseCase(
         }
     }
 
-
-
-    fun fetchPullRequestsPaginated(
+    suspend fun fetchRepositoryReadme(
         repoName: String,
         repoOwner: String,
         repoId: Long
-    ): Flow<PagingData<PullRequest>> {
-        return repoRepository.fetchPullRequestsPaginated(
-            repoName = repoName,
-            repoOwner = repoOwner,
-            repoId = repoId
-        )
+    ): Result<RepoReadme> {
+        return withContext(Dispatchers.IO) {
+            repoRepository.fetchRepositoryReadme(
+                repoName = repoName,
+                repoOwner = repoOwner,
+                repoId = repoId
+            )
+        }
     }
-
-
-
-    fun fetchIssuesPaginated(
-        repoName: String,
-        repoOwner: String,
-        repoId: Long
-    ): Flow<PagingData<Issue>> {
-        return repoRepository.fetchIssuesPaginated(
-            repoName = repoName,
-            repoOwner = repoOwner,
-            repoId = repoId
-        )
-    }
-
 }

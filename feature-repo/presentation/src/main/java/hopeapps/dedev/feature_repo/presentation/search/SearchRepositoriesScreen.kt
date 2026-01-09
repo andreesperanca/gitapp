@@ -36,7 +36,6 @@ import androidx.compose.runtime.setValue
 import androidx.compose.ui.Alignment
 import androidx.compose.ui.Modifier
 import androidx.compose.ui.res.stringResource
-import androidx.compose.ui.unit.dp
 import androidx.paging.LoadState
 import androidx.paging.compose.LazyPagingItems
 import androidx.paging.compose.collectAsLazyPagingItems
@@ -50,7 +49,7 @@ import hopeapps.dedev.core.presentation.designsystem.components.DefaultTitle
 import hopeapps.dedev.core.presentation.designsystem.components.DefaultTopAppBar
 import hopeapps.dedev.core.presentation.designsystem.components.EmptyState
 import hopeapps.dedev.core.presentation.designsystem.components.ErrorState
-import hopeapps.dedev.core.presentation.designsystem.components.RepositoryItem
+import hopeapps.dedev.feature_repo.presentation.components.RepositoryItem
 import hopeapps.dedev.feature_repo.domain.entity.RepoSort
 import hopeapps.dedev.feature_repo.domain.entity.Repository
 import org.koin.compose.viewmodel.koinViewModel
@@ -68,7 +67,10 @@ fun SearchRepositoriesScreenRoot(
     }
 
     SearchRepositoriesScreen(
-        viewModel, repositories, onBackListener, clickListenerRepository
+        viewModel = viewModel,
+        repositories = repositories,
+        onBackListener = onBackListener,
+        clickListenerRepository = clickListenerRepository
     )
 }
 
@@ -201,7 +203,7 @@ fun SearchRepositoriesScreen(
                     .navigationBarsPadding(),
                 contentPadding = PaddingValues(
                     horizontal = LocalSpacing.current.medium,
-                    vertical = 8.dp
+                    vertical = LocalSpacing.current.small
                 ),
                 verticalArrangement = Arrangement.spacedBy(LocalSpacing.current.small),
                 state = listState

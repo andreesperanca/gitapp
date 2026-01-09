@@ -1,4 +1,4 @@
-package hopeapps.dedev.core.presentation.designsystem.components
+package hopeapps.dedev.feature_repo.presentation.components
 
 import androidx.compose.foundation.layout.Arrangement
 import androidx.compose.foundation.layout.Column
@@ -15,6 +15,9 @@ import androidx.compose.ui.Alignment
 import androidx.compose.ui.Modifier
 import androidx.compose.ui.unit.dp
 import hopeapps.dedev.core.presentation.designsystem.LocalSpacing
+import hopeapps.dedev.core.presentation.designsystem.components.DefaultText
+import hopeapps.dedev.core.presentation.designsystem.components.DefaultTitle
+import hopeapps.dedev.core.presentation.designsystem.components.DotIndicator
 
 @Composable
 fun RepositoryItem(
